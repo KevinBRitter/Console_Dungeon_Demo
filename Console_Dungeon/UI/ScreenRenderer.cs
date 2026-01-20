@@ -11,6 +11,9 @@
 
         public static void DrawScreen(string text)
         {
+            // TODO: add a way to customize line endings to section off different parts of the screen
+            // I'm thinking a replaceable character like + that is replaced with +----- etc ----+ as a line
+            // Perhaps each DrawScreen call should take in header, body, and footer strings separately?
             int textWidth = ScreenWidth - 2 - PaddingLeft - PaddingRight;
             int textHeight = ScreenHeight - 2 - PaddingTop - PaddingBottom;
 
