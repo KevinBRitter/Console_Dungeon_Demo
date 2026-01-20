@@ -2,11 +2,11 @@
 {
     public static class ScreenRenderer
     {
-        private const int ScreenWidth = 60;
-        private const int ScreenHeight = 15;
-        private const int PaddingLeft = 4;
+        private const int ScreenWidth = 80;  // Standard console width, a little wide but saves room for minimap if needed
+        private const int ScreenHeight = 20; // 25 fits, but doesn't leave room for user input
+        private const int PaddingLeft = 4; // Leave room for border plus some padding white space
         private const int PaddingRight = 4;
-        private const int PaddingTop = 1;
+        private const int PaddingTop = 1; // Leave room for border no white space
         private const int PaddingBottom = 1;
 
         public static void DrawScreen(string text)

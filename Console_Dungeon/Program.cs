@@ -5,10 +5,11 @@ class Program
     static void Main()
     {
         bool running = true;
+        var mainMenu = new MainMenu();
 
         while (running)
         {
-            running = MainMenu.Show();
+            running = mainMenu.Show();
         }
     }
 }

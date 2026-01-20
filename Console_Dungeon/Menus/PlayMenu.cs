@@ -3,15 +3,15 @@ using Console_Dungeon.UI;
 
 namespace Console_Dungeon.Menus
 {
-    public class MainMenu: IMenu
+    internal class PlayMenu
     {
         public bool Show()
         {
             string menuText =
-                "Main Menu\n\n" +
-                "  1) Play\n" +
-                "  2) Options\n" +
-                "  3) Exit\n\n";
+                "Console Dungeon Crawler\n\n" +
+                "  1) New Adventure\n" +
+                "  2) Continue\n" +
+                "  3) Return\n\n";
 
             ScreenRenderer.DrawScreen(menuText);
 
@@ -20,15 +20,15 @@ namespace Console_Dungeon.Menus
             switch (input)
             {
                 case "1":
-                    Play();
+                    NewGame();
                     return true;
 
                 case "2":
-                    Options();
+                    ContinueGame();
                     return true;
 
                 case "3":
-                    Exit();
+                    ReturnToMain();
                     return false;
 
                 default:
@@ -37,28 +37,22 @@ namespace Console_Dungeon.Menus
             }
         }
 
-        private static void Play()
+        private static void NewGame()
         {
-            var playMenu = new PlayMenu();
-
-            // Loop while the PlayMenu wants to remain active.
-            // PlayMenu.Show() returns true for "stay" (New/Continue) and false for "Return".
-            bool stayInPlay = true;
-            while (stayInPlay)
-            {
-                stayInPlay = playMenu.Show();
-            }
-        }
-
-        private static void Options()
-        {
-            ScreenRenderer.DrawScreen("Options selected. Press any key to return.");
+            ScreenRenderer.DrawScreen("New game selected. Press any key to return.");
             InputHandler.WaitForKey();
         }
 
-        private static void Exit()
+        private static void ContinueGame()
         {
-            ScreenRenderer.DrawScreen("Your time in the dungeon has ended. Goodbye.");
+            ScreenRenderer.DrawScreen("Continue game selected. Press any key to return.");
+            InputHandler.WaitForKey();
+        }
+
+        private static void ReturnToMain()
+        {
+            ScreenRenderer.DrawScreen("Return to main menu selected.  Press any key to return.");
+            InputHandler.WaitForKey();
         }
 
         private static void InvalidChoice()
@@ -66,5 +60,5 @@ namespace Console_Dungeon.Menus
             ScreenRenderer.DrawScreen("Invalid choice. Press any key to return.");
             InputHandler.WaitForKey();
         }
-    }    
+    }
 }
