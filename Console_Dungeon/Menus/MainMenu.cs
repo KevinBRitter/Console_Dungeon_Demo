@@ -13,6 +13,7 @@ namespace Console_Dungeon.Menus
                 "  2) Options\n" +
                 "  3) Exit\n\n";
 
+            // use defaults from ScreenRenderer
             ScreenRenderer.DrawScreen(menuText);
 
             string input = InputHandler.GetMenuChoice();

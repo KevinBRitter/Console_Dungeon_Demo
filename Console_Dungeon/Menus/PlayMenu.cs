@@ -8,11 +8,12 @@ namespace Console_Dungeon.Menus
         public bool Show()
         {
             string menuText =
-                "Console Dungeon Crawler\n\n" +
+                "Play\n\n" +
                 "  1) New Adventure\n" +
                 "  2) Continue\n" +
                 "  3) Return\n\n";
 
+            // use defaults from ScreenRenderer
             ScreenRenderer.DrawScreen(menuText);
 
             string input = InputHandler.GetMenuChoice();

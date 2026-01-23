@@ -49,9 +49,22 @@ Planned:
 - Follow existing naming and formatting style in `UI` and `Menus`.
 
 ## How to run
+
 - From the repository root:
   - `dotnet run --project Console_Dungeon` (or open in Visual Studio and press F5).
 - Console window width: the renderer assumes ~80 columns; maximize or set console width for best presentation.
+
+## Running unit tests
+
+A new xUnit test project `Console_Dungeon.Tests` has been added. Run tests from the repository root:
+
+- Command line:
+  - `dotnet test`
+
+- Visual Studio:
+  - Open **Test Explorer** (__Test Explorer__) and run the tests from there.
+
+Add tests whenever you change layout logic (for example `UI/ScreenRenderer.cs` and `UI/TextFormatter.cs`) to catch regressions early.
 
 ## Roadmap / next steps
 - Wire `OptionsMenu` into `MainMenu` with the same navigation model.
@@ -67,10 +80,3 @@ Planned:
 ## Notes for development
 - Consider converting input/output to interfaces for automated testing (e.g., `IConsole`).
 - Keep `ScreenRenderer` and `TextFormatter` static for now since they are stateless helpers; convert only if instance customization is needed.
-
-If you'd like, I can:
-- Create a `README` section with sample playthrough text.
-- Convert the boolean menu-return pattern to a `MenuAction` enum and update the menus.
-- Wire `OptionsMenu` into the `MainMenu` and show an example `Options` implementation.
-
-Which would you like next?
