@@ -56,15 +56,20 @@ Planned:
 
 ## Running unit tests
 
-A new xUnit test project `Console_Dungeon.Tests` has been added. Run tests from the repository root:
+A test project `Console_Dungeon.Tests` (xUnit) is included to validate layout and formatting.
 
-- Command line:
-  - `dotnet test`
+From the repo root:
 
-- Visual Studio:
-  - Open **Test Explorer** (__Test Explorer__) and run the tests from there.
+- Run all tests: `dotnet test`
 
-Add tests whenever you change layout logic (for example `UI/ScreenRenderer.cs` and `UI/TextFormatter.cs`) to catch regressions early.
+In Visual Studio:
+
+- Open __Test Explorer__ and run tests there.
+
+Notes:
+- Tests capture renderer output via `ScreenRenderer.Output` (a `TextWriter`) — you don't need to redirect `Console.Out`.
+- `ScreenRenderer.DrawScreen(string body)` uses built-in defaults for header/footer. Pass `""` to suppress defaults or pass explicit `header`/`footer` arguments to override.
+- `Console.Clear()` is intentionally guarded to avoid failing tests when no console is attached.
 
 ## Roadmap / next steps
 - Wire `OptionsMenu` into `MainMenu` with the same navigation model.
