@@ -1,3 +1,5 @@
+<a id="top" />
+
 # Console Dungeon (Demo)
 
 Console Dungeon is a small, extendable console-based roguelike demo written in C# targeting .NET 8. The project is intentionally minimal so you can iterate on gameplay, UI, and architecture without heavy tooling.
@@ -73,14 +75,16 @@ Notes:
 - `ScreenRenderer.DrawScreen(string body)` uses built-in defaults for header/footer. Pass `""` to suppress defaults or pass explicit `header`/`footer` arguments to override.
 - `Console.Clear()` is intentionally guarded to avoid failing tests when no console is attached.
 
+<a id="roadmap" />
+
 ## Roadmap / Next Steps
-- [Phase 1 — Foundations (Player Can “Play”)](ROADMAP.md#phase-1--foundations-player-can-play)
-- [Phase 2 — Minimal Dungeon & Movement](ROADMAP.md#phase-2--minimal-dungeon--movement)
-- [Phase 3 — Player Identity & Progression](ROADMAP.md#phase-3--player-identity--progression)
-- [Phase 4 — Interaction & Combat](ROADMAP.md#phase-4--interaction--combat)
-- [Phase 5 — Inventory & Items](ROADMAP.md#phase-5--inventory--items)
-- [Phase 6 — Persistence & Polish](ROADMAP.md#phase-6--persistence--polish)
-- [Early Game Feature Ideas (Low Cost, High Value)](ROADMAP.md#early--game--feature--idea--(low--cost,--high--value))
+- [Phase 1 — Foundations (Player Can “Play”)](ROADMAP.md#phase-1)
+- [Phase 2 — Minimal Dungeon & Movement](ROADMAP.md#phase-2)
+- [Phase 3 — Player Identity & Progression](ROADMAP.md#phase-3)
+- [Phase 4 — Interaction & Combat](ROADMAP.md#phase-4)
+- [Phase 5 — Inventory & Items](ROADMAP.md#phase-5)
+- [Phase 6 — Persistence & Polish](ROADMAP.md#phase-6)
+- [Early Game Feature Ideas (Low Cost, High Value)](ROADMAP.md#early-game-features))
 
 ## Contribution
 - Open a PR for any feature or bugfix.
@@ -90,3 +94,5 @@ Notes:
 ## Notes for development
 - Consider converting input/output to interfaces for automated testing (e.g., `IConsole`).
 - Keep `ScreenRenderer` and `TextFormatter` static for now since they are stateless helpers; convert only if instance customization is needed.
+
+<-- Back to [top](#top)

@@ -1,11 +1,15 @@
+<a id="top" />
+
 # Console Dungeon – Development Roadmap
 
 This document contains detailed design notes, phased implementation plans,
 and experimental gameplay ideas for Console Dungeon.  As each is implemented I'll add dates or commits indicating when they were implemented.
 
-<-- Back to [README](README.md#roadmap--/--next--steps)
+<-- Back to [README](README.md#roadmap)
 
 ---
+
+<a id="phase-1" />
 
 ## Phase 1 — Foundations (Player Can “Play”)
 
@@ -28,9 +32,11 @@ Goal: Transition from menus to a minimal but complete playable loop.
         - Check exit/death conditions
     - Keep logic separate from rendering and input
     
-<-- Back to [README](README.md#roadmap--/--next--steps)
+<-- Back to [README](README.md#roadmap)
 
 ---
+
+<a id="phase-2" />
 
 ## Phase 2 — Minimal Dungeon & Movement
 
@@ -48,9 +54,11 @@ Goal: Let the player exist somewhere and move meaningfully.
     - Unknown rooms display minimal information until visited.
     - Reinforces exploration without additional mechanics.
 
-<-- Back to [README](README.md#roadmap--/--next--steps)
+<-- Back to [README](README.md#roadmap)
 
 ---
+
+<a id="phase-3" />
 
 ## Phase 3 — Player Identity & Progression
 
@@ -67,9 +75,11 @@ Goal: Give the player stats and decisions that matter.
     - On death: show summary screen and return to main menu.
     - Keep death cheap and fast to encourage iteration.
 
-<-- Back to [README](README.md#roadmap--/--next--steps)
+<-- Back to [README](README.md#roadmap)
 
 ---
+
+<a id="phase-4" />
 
 ## Phase 4 — Interaction & Combat
 
@@ -85,9 +95,11 @@ Goal: Introduce risk and consequence.
 - Combat as a Sub-Loop
     - Combat should be its own loop, returning control cleanly to the dungeon loop.
 
-<-- Back to [README](README.md#roadmap--/--next--steps)
+<-- Back to [README](README.md#roadmap)
 
 ---
+
+<a id="phase-5" />
 
 ## Phase 5 — Inventory & Items
 
@@ -106,6 +118,8 @@ Goal: Add long-term decisions and rewards.
 
 ---
 
+<a id="phase-6" />
+
 ## Phase 6 — Persistence & Polish
 
 Goal: Make runs meaningful beyond a single session.
@@ -123,9 +137,11 @@ Goal: Make runs meaningful beyond a single session.
     - Consistent headers/footers
     - Contextual help prompts
     
-<-- Back to [README](README.md#roadmap--/--next--steps)
+<-- Back to [README](README.md#roadmap)
 
 ---
+
+<a id="early-game-features" />
 
 ## Early Game Feature Ideas (Low Cost, High Value)
 
@@ -150,4 +166,6 @@ These are intentionally small but impactful and fit well before “full systems�
     - Simple rolling text log of recent actions.
     - Useful both for players and debugging.
 
-<-- Back to [README](README.md#roadmap--/--next--steps)
+<-- Back to [README](README.md#roadmap)
+
+<-- Back to [top](#top)
