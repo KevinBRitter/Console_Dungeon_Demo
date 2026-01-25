@@ -1,16 +1,17 @@
-﻿using Console_Dungeon.Input;
+﻿using Console_Dungeon.Enums;
+using Console_Dungeon.Input;
 using Console_Dungeon.UI;
 
 namespace Console_Dungeon.Menus
 {
     public class OptionsMenu : IMenu
     {
-        public bool Show()
+        public MenuAction Show()
         {
             string menuText =
                 "Options\n\n" +
                 "  1) Audio\n" +
-                "  2) Controls\n                " +
+                "  2) Controls\n" +
                 "  3) Return\n\n";
 
             // use defaults from ScreenRenderer
@@ -22,19 +23,19 @@ namespace Console_Dungeon.Menus
             {
                 case "1":
                     AudioOptions();
-                    return true;
+                    return MenuAction.AudioOptions;
 
                 case "2":
                     ControlOptions();
-                    return true;
+                    return MenuAction.ControlOptions;
 
                 case "3":
                     ReturnToMain();
-                    return false;
+                    return MenuAction.Back;
 
                 default:
                     InvalidChoice();
-                    return true;
+                    return MenuAction.Stay;
             }
         }
 

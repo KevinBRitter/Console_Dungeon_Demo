@@ -1,11 +1,12 @@
-﻿using Console_Dungeon.Input;
+﻿using Console_Dungeon.Enums;
+using Console_Dungeon.Input;
 using Console_Dungeon.UI;
 
 namespace Console_Dungeon.Menus
 {
     internal class PlayMenu
     {
-        public bool Show()
+        public MenuAction Show()
         {
             string menuText =
                 "Play\n\n" +
@@ -21,33 +22,19 @@ namespace Console_Dungeon.Menus
             switch (input)
             {
                 case "1":
-                    NewGame();
-                    return true;
+                    return MenuAction.NewGame;
 
                 case "2":
-                    ContinueGame();
-                    return true;
+                    return MenuAction.ContinueGame;
 
                 case "3":
                     ReturnToMain();
-                    return false;
+                    return MenuAction.Back;
 
                 default:
                     InvalidChoice();
-                    return true;
+                    return MenuAction.Stay;
             }
-        }
-
-        private static void NewGame()
-        {
-            ScreenRenderer.DrawScreen("New game selected. Press any key to return.");
-            InputHandler.WaitForKey();
-        }
-
-        private static void ContinueGame()
-        {
-            ScreenRenderer.DrawScreen("Continue game selected. Press any key to return.");
-            InputHandler.WaitForKey();
         }
 
         private static void ReturnToMain()
