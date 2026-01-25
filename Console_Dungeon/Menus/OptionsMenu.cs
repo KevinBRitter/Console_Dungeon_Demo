@@ -23,31 +23,31 @@ namespace Console_Dungeon.Menus
             {
                 case "1":
                     AudioOptions();
-                    return MenuAction.AudioOptions;
+                    return MenuAction.Main; // change to AudioOptions when needed
 
                 case "2":
                     ControlOptions();
-                    return MenuAction.ControlOptions;
+                    return MenuAction.Main; // change to ControlOptions when needed
 
                 case "3":
                     ReturnToMain();
-                    return MenuAction.Back;
+                    return MenuAction.Main;
 
                 default:
                     InvalidChoice();
-                    return MenuAction.Stay;
+                    return MenuAction.Options;
             }
         }
 
         private static void AudioOptions()
         {
-            ScreenRenderer.DrawScreen("Audio options selected. Press any key to return.");
+            ScreenRenderer.DrawScreen("Audio options selected, but not implemented. Press any key to return.");
             InputHandler.WaitForKey();
         }
 
         private static void ControlOptions()
         {
-            ScreenRenderer.DrawScreen("Control options selected. Press any key to return.");
+            ScreenRenderer.DrawScreen("Control options selected, but not implemented. Press any key to return.");
             InputHandler.WaitForKey();
         }
 

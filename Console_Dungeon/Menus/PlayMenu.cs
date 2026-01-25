@@ -29,11 +29,11 @@ namespace Console_Dungeon.Menus
 
                 case "3":
                     ReturnToMain();
-                    return MenuAction.Back;
+                    return MenuAction.Main;
 
                 default:
                     InvalidChoice();
-                    return MenuAction.Stay;
+                    return MenuAction.Play;
             }
         }
 

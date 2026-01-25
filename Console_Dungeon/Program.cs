@@ -6,25 +6,27 @@ class Program
     static void Main(string[] args)
     {
         IMenu currentMenu = new MainMenu();
+        MenuAction action = currentMenu.Show();
 
         while (true)
         {
-            MenuAction action = currentMenu.Show();
             switch (action)
-            { 
+            {
+                case MenuAction.Main:
+                    action = currentMenu.Show();
+                    break;
                 case MenuAction.Play:
                     var playMenu = new PlayMenu();
-                    playMenu.Show(); // Assume PlayMenu handles its own loop and returns to MainMenu when done
+                    action = playMenu.Show(); // Assume PlayMenu handles its own loop and returns to MainMenu when done
                     break;
                 case MenuAction.Options:
                     var optionsMenu = new OptionsMenu();
-                    optionsMenu.Show(); // Assume OptionsMenu handles its own loop and returns to MainMenu when done
+                    action = optionsMenu.Show(); // Assume OptionsMenu handles its own loop and returns to MainMenu when done
                     break;
                 case MenuAction.Exit:
                     return; // Exit the application
-                case MenuAction.Stay:
                 default:
-                    continue; // Stay in the current menu
+                    continue; // Stay in the current menu (MainMenu)
             }
         }
     }

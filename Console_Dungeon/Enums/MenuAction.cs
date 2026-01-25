@@ -2,10 +2,10 @@
 {
     public enum MenuAction
     {
-        Stay,
-        Back,
-        Options,
+        Main,
         Play,
+        Options,
+        Back,
         Exit,
         AudioOptions,
         ControlOptions,

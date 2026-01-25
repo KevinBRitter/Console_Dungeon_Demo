@@ -33,7 +33,7 @@ namespace Console_Dungeon.Menus
 
                 default:
                     InvalidChoice();
-                    return MenuAction.Stay;
+                    return MenuAction.Main;
             }
         }
 
