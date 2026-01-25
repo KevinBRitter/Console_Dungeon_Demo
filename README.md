@@ -21,6 +21,7 @@ Planned:
 - Persistent saves (Continue).
 - Difficulty and display options.
 - More menus (Options, Inventory, Character).
+- Meta objects like divine weapons and armor that act as soul bound gifts from gods aware of the game loop and available in any playthrough after earning
 
 ## Controls
 - Keyboard input via the console.
@@ -29,18 +30,19 @@ Planned:
 
 ## Navigation model
 - Menus implement `IMenu` and return a bool from `Show()`:
-  - `true` means remain in the current flow (or continue the loop).
-  - `false` signals a return to the previous menu or exit.
-- `MainMenu` instantiates `PlayMenu` and loops while `PlayMenu.Show()` returns `true`, keeping control flow clear and easy to extend.
+- Values such as Stay, Back, Options, Play, and Exit indicated navigation outcomes
+- `MainMenu` instantiates `PlayMenu` and `OptionsMenu` looping while each menu returns an appropriate `MenuAction`, keeping control flow clear and easy to extend.
 
 ## Project structure (important files)
 - `Program.cs` — application entry and main loop.
 - `Menus/IMenu.cs` — menu interface.
 - `Menus/MainMenu.cs` — entry menu; instantiates other menus.
+- `Menus/OptionsMenu.cs` — options submenu with audio and controls settings.
 - `Menus/PlayMenu.cs` — play submenu with New/Continue/Return options.
 - `UI/ScreenRenderer.cs` — draws framed screens and handles layout.
 - `UI/TextFormatter.cs` — wraps text to fit the screen width.
 - `Input/InputHandler.cs` — central place for console input.
+- `Enums/MenuAction.cs` - enum representing possible menu actions.
 
 ## Technical notes for contributors
 - Language: C# 12; Target: .NET 8.0
@@ -71,11 +73,14 @@ Notes:
 - `ScreenRenderer.DrawScreen(string body)` uses built-in defaults for header/footer. Pass `""` to suppress defaults or pass explicit `header`/`footer` arguments to override.
 - `Console.Clear()` is intentionally guarded to avoid failing tests when no console is attached.
 
-## Roadmap / next steps
-- Wire `OptionsMenu` into `MainMenu` with the same navigation model.
-- Replace boolean returns with a `MenuAction` enum if multiple navigation outcomes are required.
-- Add a simple dungeon generator and a turn-based action loop.
-- Add unit tests for menus and text formatting.
+## Roadmap / Next Steps
+- [Phase 1 — Foundations (Player Can “Play”)](ROADMAP.md#phase-1--foundations-player-can-play)
+- [Phase 2 — Minimal Dungeon & Movement](ROADMAP.md#phase-2--minimal-dungeon--movement)
+- [Phase 3 — Player Identity & Progression](ROADMAP.md#phase-3--player-identity--progression)
+- [Phase 4 — Interaction & Combat](ROADMAP.md#phase-4--interaction--combat)
+- [Phase 5 — Inventory & Items](ROADMAP.md#phase-5--inventory--items)
+- [Phase 6 — Persistence & Polish](ROADMAP.md#phase-6--persistence--polish)
+- [Early Game Feature Ideas (Low Cost, High Value)](ROADMAP.md#early--game--feature--idea--(low--cost,--high--value))
 
 ## Contribution
 - Open a PR for any feature or bugfix.
