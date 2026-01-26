@@ -25,7 +25,8 @@ namespace Console_Dungeon.Menus
                     return MenuAction.NewGame;
 
                 case "2":
-                    return MenuAction.ContinueGame;
+                    ContinueNotAvailable();
+                    return MenuAction.Play; // Stay in Play menu
 
                 case "3":
                     ReturnToMain();
@@ -35,6 +36,15 @@ namespace Console_Dungeon.Menus
                     InvalidChoice();
                     return MenuAction.Play;
             }
+        }
+        private static void ContinueNotAvailable()
+        {
+            ScreenRenderer.DrawScreen(
+                "Continue Game\n\n" +
+                "Save functionality is not yet implemented.\n" +
+                "This feature will be available in Phase 6.\n\n" +
+                "Press any key to return...");
+            InputHandler.WaitForKey();
         }
 
         private static void ReturnToMain()
