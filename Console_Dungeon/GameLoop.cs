@@ -12,6 +12,9 @@ namespace Console_Dungeon
         public GameLoop(GameState gameState)
         {
             _gameState = gameState;
+
+            // Ensure encounters are loaded
+            EncounterManager.LoadEncounters();
         }
 
         // Main game loop - returns MenuAction to indicate how to exit
@@ -104,29 +107,97 @@ namespace Console_Dungeon
 
             // Simple random encounter (placeholder)
             Random rng = new Random(_gameState.Seed + _gameState.TurnCount);
-            int encounter = rng.Next(1, 4);
+            int encounterType = rng.Next(1, 11); // 1-10 for weighted distribution
 
-            string encounterText = encounter switch
-            {
-                1 => "You find a small cache of gold! (+10 gold)",
-                2 => "A goblin attacks! You defeat it but take damage. (-15 HP)",
-                3 => "The room is empty. Dust motes drift in the torchlight.",
-                _ => "You hear distant echoes..."
-            };
+            string encounterText;
 
-            // Apply encounter effects
-            switch (encounter)
+            // Weighted encounters: 30% treasure, 50% combat, 20% empty
+            if (encounterType <= 3)
             {
-                case 1:
-                    _gameState.Player.Gold += 10;
-                    break;
-                case 2:
-                    _gameState.Player.TakeDamage(15);
-                    break;
+                // Treasure encounters (30%)
+                encounterText = TreasureEncounter(rng);
+            }
+            else if (encounterType <= 8)
+            {
+                // Combat encounters (50%)
+                encounterText = CombatEncounter(rng);
+            }
+            else
+            {
+                // Empty room encounters (20%)
+                encounterText = EmptyRoomEncounter(rng);
             }
 
             ScreenRenderer.DrawScreen(encounterText + "\n\nPress any key to continue...");
             InputHandler.WaitForKey();
+        }
+
+        private string TreasureEncounter(Random rng)
+        {
+            var encounters = EncounterManager.GetEncounters();
+            int goldAmount = rng.Next(5, 21); // 5-20 gold
+            _gameState.Player.Gold += goldAmount;
+
+            string template = encounters.TreasureEncounters[rng.Next(encounters.TreasureEncounters.Count)];
+            return EncounterManager.FormatMessage(template, ("gold", goldAmount));
+        }
+
+        private string CombatEncounter(Random rng)
+        {
+            var encounters = EncounterManager.GetEncounters();
+
+            // Choose random enemy type
+            string[] enemyKeys = new[] { "goblin", "skeleton", "slime", "goblinPair" };
+            string enemyKey = enemyKeys[rng.Next(enemyKeys.Length)];
+
+            if (!encounters.Enemies.ContainsKey(enemyKey))
+            {
+                return "An unknown creature attacks!";
+            }
+
+            var enemy = encounters.Enemies[enemyKey];
+
+            // Calculate damage and gold
+            int damage;
+            string combatMessage;
+
+            if (enemyKey == "goblinPair")
+            {
+                // Special handling for two goblins
+                int damage1 = rng.Next(8, 16);
+                int damage2 = rng.Next(8, 16);
+                damage = damage1 + damage2;
+
+                string template = enemy.EncounterMessages[rng.Next(enemy.EncounterMessages.Count)];
+                combatMessage = EncounterManager.FormatMessage(template,
+                    ("damage1", damage1),
+                    ("damage2", damage2),
+                    ("damage", damage));
+            }
+            else
+            {
+                damage = rng.Next(enemy.DamageMin, enemy.DamageMax);
+                string template = enemy.EncounterMessages[rng.Next(enemy.EncounterMessages.Count)];
+                combatMessage = EncounterManager.FormatMessage(template, ("damage", damage));
+            }
+
+            int goldDropped = rng.Next(enemy.GoldMin, enemy.GoldMax);
+
+            // Apply effects
+            _gameState.Player.TakeDamage(damage);
+            _gameState.Player.Gold += goldDropped;
+
+            // Format loot message
+            string lootTemplate = enemy.LootMessages[rng.Next(enemy.LootMessages.Count)];
+            string lootMessage = EncounterManager.FormatMessage(lootTemplate, ("gold", goldDropped));
+
+            return $"{combatMessage}\n{lootMessage}";
+        }
+
+        private string EmptyRoomEncounter(Random rng)
+        {
+            var encounters = EncounterManager.GetEncounters();
+            return encounters.EmptyRooms[rng.Next(encounters.EmptyRooms.Count)];
         }
 
         private void Rest()

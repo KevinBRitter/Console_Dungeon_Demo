@@ -1,0 +1,96 @@
+﻿{
+  "treasureEncounters": [
+    "You find a small cache of gold coins scattered on the floor! (+{gold} gold)",
+    "A glint catches your eye—a leather pouch containing {gold} gold pieces!",
+    "Searching the room, you discover {gold} gold hidden in a cracked urn.",
+    "The skeleton of a previous adventurer clutches {gold} gold. You take it reverently.",
+    "A loose stone in the wall conceals a small stash of {gold} gold!"
+  ],
+  "emptyRooms": [
+    "The room is empty. Dust motes drift lazily in the torchlight.",
+    "Nothing here but cobwewebs and the echo of your footsteps.",
+    "An abandoned chamber. Ancient tapestries hang in tatters on the walls.",
+    "The room is bare, save for a few scattered bones and rust-stained chains.",
+    "You find nothing of interest—just cold stone and shadows.",
+    "The chamber is silent and still. Water drips somewhere in the distance.",
+    "Empty. A faded mural on the wall depicts heroes of a bygone age."
+  ],
+  "enemies": {
+    "goblin": {
+      "name": "Goblin",
+      "damageMin": 8,
+      "damageMax": 16,
+      "goldMin": 3,
+      "goldMax": 8,
+      "encounterMessages": [
+        "A goblin leaps from the shadows! You fight it off but take {damage} damage.",
+        "A snarling goblin attacks! You defeat it but suffer {damage} damage.",
+        "A crude goblin rushes at you! After a brief scuffle, you win but take {damage} damage.",
+        "You're ambushed by a goblin! You emerge victorious but wounded for {damage} damage."
+      ],
+      "lootMessages": [
+        "Searching the goblin's pouch, you find {gold} gold.",
+        "The goblin drops {gold} gold coins as it falls.",
+        "You loot {gold} gold from the goblin's crude belt pouch.",
+        "Scattered around the goblin are {gold} gold pieces."
+      ]
+    },
+    "skeleton": {
+      "name": "Skeleton",
+      "damageMin": 10,
+      "damageMax": 18,
+      "goldMin": 5,
+      "goldMax": 11,
+      "encounterMessages": [
+        "A skeleton warrior rattles toward you! After a fierce battle, you prevail but suffer {damage} damage.",
+        "Bones clatter as a skeleton attacks! You shatter it but take {damage} damage.",
+        "An undead warrior rises to fight! You win but suffer {damage} damage.",
+        "A skeletal figure lunges! You destroy it but are wounded for {damage} damage."
+      ],
+      "lootMessages": [
+        "The skeleton crumbles to dust, revealing {gold} gold coins.",
+        "Among the skeleton's bones, you find {gold} gold.",
+        "The warrior's ancient purse contains {gold} gold.",
+        "You collect {gold} gold from the skeleton's remains."
+      ]
+    },
+    "slime": {
+      "name": "Slime",
+      "damageMin": 5,
+      "damageMax": 13,
+      "goldMin": 2,
+      "goldMax": 6,
+      "encounterMessages": [
+        "A gelatinous slime oozes from a crack in the wall! Its acidic body burns you for {damage} damage before you destroy it.",
+        "A blob of slime drops from above! You dissolve it but take {damage} acid damage.",
+        "An ooze slides toward you! You defeat it but suffer {damage} damage from its corrosive touch.",
+        "A puddle suddenly animates! You destroy the slime but take {damage} damage."
+      ],
+      "lootMessages": [
+        "Within the slime's remains, you spot {gold} gold coins it had absorbed.",
+        "The slime's goo dissolves, leaving {gold} gold behind.",
+        "You extract {gold} gold from the slime's gelatinous mass.",
+        "Somehow, the slime had {gold} gold inside it."
+      ]
+    },
+    "goblinPair": {
+      "name": "Two Goblins",
+      "damageMin": 16,
+      "damageMax": 32,
+      "goldMin": 6,
+      "goldMax": 15,
+      "encounterMessages": [
+        "Two goblins ambush you! You defeat them both but take {damage1} and {damage2} damage ({damage} total).",
+        "A pair of goblins attack in tandem! You fight them off but suffer {damage1} and {damage2} damage ({damage} total).",
+        "Goblins flank you from both sides! You prevail but take {damage1} and {damage2} damage ({damage} total).",
+        "Two snarling goblins charge! You defeat them but are wounded for {damage1} and {damage2} damage ({damage} total)."
+      ],
+      "lootMessages": [
+        "Looting their bodies, you collect {gold} gold total.",
+        "Between the two goblins, you find {gold} gold.",
+        "You gather {gold} gold from both goblins.",
+        "The goblins had {gold} gold between them."
+      ]
+    }
+  }
+}
