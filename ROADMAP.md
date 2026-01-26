@@ -14,7 +14,7 @@ and experimental gameplay ideas for Console Dungeon.  As each is implemented I'l
 ## Phase 1 — Foundations (Player Can “Play”)
 
 Goal: Transition from menus to a minimal but complete playable loop.
-Implemented: 01/25/26 - KR
+`Implemented: 01/25/26 - KR`
 
 - Introduce a GameState model
     - Introduce a `GameState` object (player, dungeon level, RNG seed, flags).
@@ -166,6 +166,25 @@ These are intentionally small but impactful and fit well before “full systems�
 - Event Log
     - Simple rolling text log of recent actions.
     - Useful both for players and debugging.
+
+<-- Back to [README](README.md#roadmap)
+
+---
+
+<a id="late-game-enhancements" />
+
+## Late Game Enhancements
+
+- Enemy difficulty scaling based on _gameState.CurrentLevel.LevelNumber
+- Critical hits (10% chance for double damage?)
+- Loot drops (enemies sometimes drop items, not just gold)
+- Rare encounters (mimics, treasure guardians, etc.)
+- Environmental hazards (traps, poison gas, etc.)
+- Multiple encounter files - TreasureEncounters.json, Enemies.json, etc.
+- Localization - Encounters_en.json, Encounters_es.json
+- Enemy difficulty tiers - Load different enemy sets per dungeon level
+- Hot reload - Watch JSON files and reload without restarting
+- Validation - Check for missing placeholders or malformed data
 
 <-- Back to [README](README.md#roadmap)
 
