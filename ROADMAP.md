@@ -14,6 +14,7 @@ and experimental gameplay ideas for Console Dungeon.  As each is implemented I'l
 ## Phase 1 — Foundations (Player Can “Play”)
 
 Goal: Transition from menus to a minimal but complete playable loop.
+Implemented: 01/25/26 - KR
 
 - Introduce a GameState model
     - Introduce a `GameState` object (player, dungeon level, RNG seed, flags).
