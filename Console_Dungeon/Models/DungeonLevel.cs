@@ -128,9 +128,15 @@ namespace Console_Dungeon.Models
             BossRoomY = bossY;
             Rooms[bossX, bossY].IsBossRoom = true;
             Rooms[bossX, bossY].HasEncounter = true; // ENSURE THIS IS SET
+            Rooms[bossX, bossY].IsBlocked = false;
 
             var rng = new Random(Seed);
             Rooms[bossX, bossY].Description = RoomDescriptionManager.GetRandomBossRoom(rng);
+
+            DebugLogger.Log($"Boss room placed at ({bossX}, {bossY})");
+            DebugLogger.Log($"Boss room - IsBossRoom: {Rooms[bossX, bossY].IsBossRoom}");
+            DebugLogger.Log($"Boss room - HasEncounter: {Rooms[bossX, bossY].HasEncounter}");
+            DebugLogger.Log($"Boss room - IsBlocked: {Rooms[bossX, bossY].IsBlocked}");
         }
 
         private int CountWalkableRooms()

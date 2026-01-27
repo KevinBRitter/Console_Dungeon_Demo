@@ -1,4 +1,4 @@
-﻿{
+{
   "treasureEncounters": [
     "You find a small cache of gold coins scattered on the floor! (+{gold} gold)",
     "A glint catches your eye—a leather pouch containing {gold} gold pieces!",
@@ -36,6 +36,13 @@
       "goldMin": 3,
       "goldMax": 8
     },
+    "goblinChief": {
+      "name": "Goblin Chief",
+      "damageMin": 14,
+      "damageMax": 22,
+      "goldMin": 9,
+      "goldMax": 15
+    },
     "skeleton": {
       "name": "Skeleton",
       "damageMin": 10,
@@ -43,12 +50,26 @@
       "goldMin": 5,
       "goldMax": 11
     },
+    "boneCrocodile": {
+      "name": "Bone Crocodile",
+      "damageMin": 12,
+      "damageMax": 20,
+      "goldMin": 7,
+      "goldMax": 13
+    },
     "slime": {
       "name": "Slime",
       "damageMin": 5,
       "damageMax": 13,
       "goldMin": 2,
       "goldMax": 6
+    },
+    "lavaSlime": {
+      "name": "Lava Slime",
+      "damageMin": 10,
+      "damageMax": 18,
+      "goldMin": 5,
+      "goldMax": 11
     },
     "skeletonWarrior": {
       "name": "Skeleton Warrior",
@@ -129,6 +150,72 @@
       ]
     },
     {
+      "id": "goblin_truple",
+      "weight": 6,
+      "minLevel": 2,
+      "maxLevel": 6,
+      "isBoss": false,
+      "enemies": [
+        {
+          "type": "goblin",
+          "count": 3
+        }
+      ],
+      "encounterMessages": [
+        "Three goblins ambush you!",
+        "A group of three of goblins attack in tandem!",
+        "Goblins flank you from both sides! While one stares you down... Clever girl!",
+        "Three growling goblins rush you!"
+      ],
+      "victoryMessages": [
+        "You defeat the goblins but take {totalDamage} damage total.",
+        "You fight them off but suffer {totalDamage} damage.",
+        "You won this battle but take {totalDamage} damage.",
+        "You defeat them but are wounded for {totalDamage} damage."
+      ],
+      "lootMessages": [
+        "Looting their bodies, you collect {totalGold} gold total.",
+        "Between the three goblins, you find {totalGold} gold.",
+        "You gather {totalGold} gold from the scattered goblin remains.",
+        "The goblins had {totalGold} gold between them."
+      ]
+    },
+    {
+      "id": "goblin_chief",
+      "weight": 10,
+      "minLevel": 1,
+      "maxLevel": 6,
+      "isBoss": true,
+      "enemies": [
+        {
+          "type": "goblinChief",
+          "count": 1
+        },
+        {
+          "type": "goblin",
+          "count": 2
+        }
+      ],
+      "encounterMessages": [
+        "A goblin chief and its minions rush to fight you!",
+        "A goblin war party is here with chief and bodyguards!",
+        "A goblin chief orders its crew to flank you!",
+        "An enraged goblin chief points at you, two lesser goblins attack!"
+      ],
+      "victoryMessages": [
+        "You defeated them all but take {totalDamage} damage total.",
+        "You fight them off but suffer {totalDamage} damage.",
+        "You won the day but take {totalDamage} damage.",
+        "You squeek out a victory but are wounded for {totalDamage} damage."
+      ],
+      "lootMessages": [
+        "Looting their bodies, you collect {totalGold} gold total.",
+        "Between the three goblins, you find {totalGold} gold.",
+        "You gather {totalGold} gold from all the goblins.",
+        "The goblins had {totalGold} gold between them."
+      ]
+    },
+    {
       "id": "single_skeleton",
       "weight": 10,
       "minLevel": 2,
@@ -157,6 +244,37 @@
         "Among the skeleton's bones, you find {totalGold} gold.",
         "The warrior's ancient purse contains {totalGold} gold.",
         "You collect {totalGold} gold from the skeleton's remains."
+      ]
+    },
+    {
+      "id": "skeleton_horde",
+      "weight": 5,
+      "minLevel": 3,
+      "maxLevel": 10,
+      "isBoss": true,
+      "enemies": [
+        {
+          "type": "skeleton",
+          "count": 5
+        }
+      ],
+      "encounterMessages": [
+        "Five skeleton warriors emerge from the shadows!",
+        "A horde of undead surrounds you!",
+        "Skeletal warriors pour from hidden alcoves!",
+        "You're surrounded by a group of skeletons!"
+      ],
+      "victoryMessages": [
+        "After an exhausting battle, you defeat them all but suffer {totalDamage} damage.",
+        "You fight desperately and win, taking {totalDamage} damage.",
+        "The battle is fierce. You prevail but are wounded for {totalDamage} damage.",
+        "You emerge victorious but badly hurt, having taken {totalDamage} damage."
+      ],
+      "lootMessages": [
+        "Searching the skeletal remains, you gather {totalGold} gold.",
+        "The fallen warriors had {totalGold} gold between them.",
+        "You collect {totalGold} gold from the battlefield.",
+        "Among the bones, you find {totalGold} gold total."
       ]
     },
     {
@@ -191,34 +309,38 @@
       ]
     },
     {
-      "id": "skeleton_horde",
-      "weight": 5,
-      "minLevel": 5,
-      "maxLevel": 10,
+      "id": "slime_lord",
+      "weight": 8,
+      "minLevel": 1,
+      "maxLevel": 5,
       "isBoss": true,
       "enemies": [
         {
-          "type": "skeleton",
-          "count": 5
+          "type": "lavaSlime",
+          "count": 1
+        },        
+        {
+          "type": "slime",
+          "count": 1
         }
       ],
       "encounterMessages": [
-        "Five skeleton warriors emerge from the shadows!",
-        "A horde of undead surrounds you!",
-        "Skeletal warriors pour from hidden alcoves!",
-        "You're surrounded by a group of skeletons!"
+        "An enormus glowing slime oozes from cracks in the wall!  And it brought a friend!",
+        "The room suddenly is ablaze with light as a flaming lava slime bursts forth with a lesser slime.",
+        "An ooze lord slides toward you! It radiates heat while its minion slime tries eat your armor.",
+        "A large puddle of lava suddenly animates! Steam forms a second smaller slime."
       ],
       "victoryMessages": [
-        "After an exhausting battle, you defeat them all but suffer {totalDamage} damage.",
-        "You fight desperately and win, taking {totalDamage} damage.",
-        "The battle is fierce. You prevail but are wounded for {totalDamage} damage.",
-        "You emerge victorious but badly hurt, having taken {totalDamage} damage."
+        "Their steaming acidic bodies burned you for {totalDamage} damage before you destroyed them.",
+        "You dissolve the slimes but take {totalDamage} burn damage.",
+        "You defeat them but suffer {totalDamage} damage from their corrosive touch.",
+        "You destroy the slimes but take {totalDamage} damage just by breathing around their corpses."
       ],
       "lootMessages": [
-        "Searching the skeletal remains, you gather {totalGold} gold.",
-        "The fallen warriors had {totalGold} gold between them.",
-        "You collect {totalGold} gold from the battlefield.",
-        "Among the bones, you find {totalGold} gold total."
+        "Within the lava slime's remains, you spot {totalGold} gold coins it had absorbed.",
+        "Their gooey bodies dissolve, leaving {totalGold} gold behind.",
+        "You extract {totalGold} gold from the slime's gelatinous masses.",
+        "Somehow, the lava slime had {totalGold} gold inside it."
       ]
     },
     {

@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 
 namespace Console_Dungeon
 {
@@ -21,7 +22,7 @@ namespace Console_Dungeon
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading room descriptions: {ex.Message}");
+                Debug.WriteLine($"Error loading room descriptions: {ex.Message}");
                 _descriptions = CreateDefaultDescriptions();
             }
         }

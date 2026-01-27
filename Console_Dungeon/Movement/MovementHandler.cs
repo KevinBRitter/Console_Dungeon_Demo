@@ -53,11 +53,14 @@ namespace Console_Dungeon.Movement
                 _gameState.CurrentLevel.RoomsExplored++;
                 _gameState.TurnCount++;
 
+                DebugLogger.Log($"First visit to room. RoomsExplored: {_gameState.CurrentLevel.RoomsExplored}");
+
                 // Show room description
                 ScreenRenderer.DrawScreen($"{desc}\n\nPress any key to continue...");
                 InputHandler.WaitForKey();
 
                 // Trigger encounter
+                DebugLogger.Log("About to trigger encounter from movement");
                 _encounterHandler.TriggerEncounter();
                 return true;
             }

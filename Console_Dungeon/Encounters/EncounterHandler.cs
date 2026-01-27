@@ -1,6 +1,7 @@
 ﻿using Console_Dungeon.Input;
 using Console_Dungeon.Models;
 using Console_Dungeon.UI;
+using System.Diagnostics;
 
 namespace Console_Dungeon.Encounters
 {
@@ -19,6 +20,13 @@ namespace Console_Dungeon.Encounters
                 _gameState.Player.PositionX,
                 _gameState.Player.PositionY);
 
+            DebugLogger.Log($"TriggerEncounter called at ({_gameState.Player.PositionX}, {_gameState.Player.PositionY})");
+            DebugLogger.Log($"Room.IsBossRoom: {currentRoom.IsBossRoom}");
+            DebugLogger.Log($"Room.HasEncounter: {currentRoom.HasEncounter}");
+            DebugLogger.Log($"Room.EncounterTriggered: {currentRoom.EncounterTriggered}");
+            DebugLogger.Log($"Room.CanTriggerEncounter: {currentRoom.CanTriggerEncounter}");
+
+
             if (!currentRoom.CanTriggerEncounter)
             {
                 ShowAlreadySearchedMessage();
@@ -30,18 +38,23 @@ namespace Console_Dungeon.Encounters
             Random rng = new Random(_gameState.Seed + _gameState.TurnCount);
             int encounterType = rng.Next(1, 11);
 
+            DebugLogger.Log($"Encounter type roll: {encounterType} (1-3=treasure, 4-8=combat, 9-10=empty)");
+
             string encounterText;
 
             if (encounterType <= 3)
             {
+                DebugLogger.Log("Triggering treasure encounter");
                 encounterText = HandleTreasure(rng);
             }
             else if (encounterType <= 8)
             {
+                DebugLogger.Log("Triggering combat encounter");
                 encounterText = HandleCombat(rng);
             }
             else
             {
+                DebugLogger.Log("Triggering empty room encounter");
                 encounterText = HandleEmptyRoom(rng);
             }
 
@@ -87,34 +100,38 @@ namespace Console_Dungeon.Encounters
             var encounters = EncounterManager.GetEncounters();
             int currentLevel = _gameState.CurrentLevel.LevelNumber;
 
+            DebugLogger.Log($"HandleCombat - Current Level: {currentLevel}");
+            DebugLogger.Log($"HandleCombat - Total Combat Encounters: {encounters.CombatEncounters.Count}");
+
             var currentRoom = _gameState.CurrentLevel.GetRoom(
                 _gameState.Player.PositionX,
                 _gameState.Player.PositionY);
 
+            DebugLogger.Log($"HandleCombat - Is Boss Room: {currentRoom.IsBossRoom}");
+
             CombatEncounter selectedEncounter;
 
-            // Check if this is a boss room
             if (currentRoom.IsBossRoom)
             {
-                // TODO: Ensure only one boss per level and that it appears.  I just tested all rooms
-                // and found 0 bosses on level 1.
-                // Get boss encounter for this level
                 selectedEncounter = GetBossEncounter(encounters, currentLevel, rng);
+                DebugLogger.Log($"HandleCombat - Selected Regular Encounter: {selectedEncounter.Id}");
             }
             else
             {
-                // Get regular encounter - MAKE SURE THIS ISN'T FILTERING OUT ALL ENCOUNTERS
                 var validEncounters = encounters.CombatEncounters
                     .Where(e => !e.IsBoss && e.MinLevel <= currentLevel && e.MaxLevel >= currentLevel)
                     .ToList();
 
+                Debug.WriteLine($"[DEBUG] Valid Regular Encounters: {validEncounters.Count}");
+
                 if (validEncounters.Count == 0)
                 {
+                    Debug.WriteLine("[DEBUG] No valid encounters found!");
                     return "An unknown creature attacks, but flees before combat begins!";
                 }
 
-                // Weighted random selection
                 selectedEncounter = SelectWeightedEncounter(validEncounters, rng);
+                Debug.WriteLine($"[DEBUG] Selected Regular Encounter: {selectedEncounter.Id}");
             }
 
             // Resolve combat

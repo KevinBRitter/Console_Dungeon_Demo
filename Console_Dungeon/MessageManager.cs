@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 
@@ -24,7 +25,7 @@ namespace Console_Dungeon
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading messages: {ex.Message}");
+                Debug.WriteLine($"Error loading messages: {ex.Message}");
                 _messages = new Dictionary<string, object>();
             }
         }

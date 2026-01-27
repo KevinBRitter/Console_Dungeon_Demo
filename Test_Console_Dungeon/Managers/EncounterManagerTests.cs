@@ -1,4 +1,5 @@
 ﻿using Console_Dungeon.Models;
+using System.Diagnostics;
 using System.Text.Json;
 using Xunit;
 
@@ -224,6 +225,26 @@ namespace Console_Dungeon.Tests.Managers
             // Assert
             Assert.NotEmpty(encounters.NeverHadEncounter);
             Assert.Contains("This room has nothing of value.", encounters.NeverHadEncounter);
+        }
+        
+        [Fact]
+        public void Encounters_LoadSuccessfully()
+        {
+            // Arrange
+            EncounterManager.LoadEncounters();
+            var encounters = EncounterManager.GetEncounters();
+
+            // Assert
+            Assert.NotEmpty(encounters.CombatEncounters);
+
+            var regularEncounters = encounters.CombatEncounters.Where(e => !e.IsBoss).ToList();
+            var bossEncounters = encounters.CombatEncounters.Where(e => e.IsBoss).ToList();
+
+            Debug.WriteLine($"Regular encounters: {regularEncounters.Count}");
+            Debug.WriteLine($"Boss encounters: {bossEncounters.Count}");
+
+            Assert.NotEmpty(regularEncounters);
+            Assert.NotEmpty(bossEncounters);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Console_Dungeon.Models;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace Console_Dungeon
@@ -25,7 +26,7 @@ namespace Console_Dungeon
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading encounters: {ex.Message}");
+                Debug.WriteLine($"Error loading encounters: {ex.Message}");
                 // Fall back to default data
                 _encounterData = CreateDefaultEncounters();
             }
