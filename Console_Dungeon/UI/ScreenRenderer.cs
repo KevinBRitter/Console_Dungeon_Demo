@@ -1,4 +1,8 @@
-﻿namespace Console_Dungeon.UI
+﻿using System;
+using System.Text;
+using Console_Dungeon.Models;
+
+namespace Console_Dungeon.UI
 {
     public static class ScreenRenderer
     {
@@ -196,6 +200,43 @@
             // This replaces the usual outer '*' characters on that row.
             string line = sep.ToString() + new string('-', Math.Max(0, ScreenWidth - 2)) + sep.ToString();
             Output.WriteLine(line);
+        }
+
+        // Renders a small ASCII map of the dungeon grid.
+        // [X] = player's current room, [E] = explored (visited), [ ] = unexplored walkable room, [Z] = wall/blocked
+        public static string RenderMap(DungeonLevel level, Models.Player player)
+        {
+            var sb = new StringBuilder();
+            for (int y = 0; y < level.Height; y++)
+            {
+                for (int x = 0; x < level.Width; x++)
+                {
+                    var room = level.GetRoom(x, y);
+
+                    if (player.PositionX == x && player.PositionY == y)
+                    {
+                        // Always show player position as [X] (player is always on a walkable tile).
+                        sb.Append("[X]");
+                    }
+                    else if (room.IsBlocked)
+                    {
+                        sb.Append("[Z]");
+                    }
+                    else
+                    {
+                        sb.Append(room.Visited ? "[E]" : "[ ]");
+                    }
+
+                    // Add a small spacer between columns for readability
+                    if (x < level.Width - 1)
+                        sb.Append(" ");
+                }
+
+                if (y < level.Height - 1)
+                    sb.AppendLine();
+            }
+
+            return sb.ToString();
         }
     }
 }

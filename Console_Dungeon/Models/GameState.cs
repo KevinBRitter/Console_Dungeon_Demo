@@ -30,7 +30,44 @@ namespace Console_Dungeon.Models
 
             // Initialize player and first level
             Player = new Player("Adventurer");
-            CurrentLevel = new DungeonLevel(1, seed);
+
+            // Generate level: 5x5 grid with a random connected path of 10 rooms.
+            int gridW = 5;
+            int gridH = 5;
+            int roomsThisLevel = 10;
+            CurrentLevel = new DungeonLevel(1, seed, gridW, gridH, roomsThisLevel);
+
+            // Place player in the center of the grid (the generator starts here).
+            Player.PositionX = CurrentLevel.Width / 2;
+            Player.PositionY = CurrentLevel.Height / 2;
+
+            // Mark starting room visited if it's not blocked. If blocked for some reason, find nearest walkable.
+            var startRoom = CurrentLevel.GetRoom(Player.PositionX, Player.PositionY);
+            if (startRoom.IsBlocked)
+            {
+                // find first walkable cell (shouldn't normally happen because generator starts at center)
+                bool found = false;
+                for (int x = 0; x < CurrentLevel.Width && !found; x++)
+                {
+                    for (int y = 0; y < CurrentLevel.Height && !found; y++)
+                    {
+                        var r = CurrentLevel.GetRoom(x, y);
+                        if (!r.IsBlocked)
+                        {
+                            Player.PositionX = x;
+                            Player.PositionY = y;
+                            startRoom = r;
+                            found = true;
+                        }
+                    }
+                }
+            }
+
+            if (!startRoom.Visited && !startRoom.IsBlocked)
+            {
+                startRoom.Visited = true;
+                CurrentLevel.RoomsExplored = 1;
+            }
         }
 
         // Parameterless constructor for deserialization

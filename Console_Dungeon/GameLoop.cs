@@ -53,6 +53,7 @@ namespace Console_Dungeon
 
         private void RenderGameState()
         {
+            // Map removed from the main status to avoid overflowing the render area.
             string status =
                 $"=== {_gameState.Player.Name} ===\n\n" +
                 $"Level: {_gameState.Player.Level}  |  " +
@@ -61,12 +62,13 @@ namespace Console_Dungeon
                 $"Attack: {_gameState.Player.Attack}  |  Defense: {_gameState.Player.Defense}\n\n" +
                 $"--- Dungeon Level {_gameState.CurrentLevel.LevelNumber} ---\n" +
                 $"Rooms Explored: {_gameState.CurrentLevel.RoomsExplored}/{_gameState.CurrentLevel.TotalRooms}\n\n" +
-                $"You stand in a dimly lit chamber. Shadows dance on the stone walls.\n\n" +
+                // Make viewing the map a dedicated action to avoid overflowing the body
                 $"What will you do?\n\n" +
-                $"  1) Explore deeper\n" +
-                $"  2) Rest (restore 20 HP)\n" +
-                $"  3) Check status\n" +
-                $"  4) Return to Main Menu\n\n";
+                $"  1) View Map (choose direction from the map)\n" +
+                $"  2) Search current room (may trigger events)\n" +
+                $"  3) Rest (restore 20 HP)\n" +
+                $"  4) Check status\n" +
+                $"  5) Return to Main Menu\n\n";
 
             ScreenRenderer.DrawScreen(status);
         }
@@ -81,15 +83,18 @@ namespace Console_Dungeon
             switch (action)
             {
                 case "1":
-                    ExploreRoom();
+                    ShowMapView();
                     return null;
                 case "2":
-                    Rest();
+                    ExploreRoom();
                     return null;
                 case "3":
-                    ShowDetailedStatus();
+                    Rest();
                     return null;
                 case "4":
+                    ShowDetailedStatus();
+                    return null;
+                case "5":
                     if (ConfirmExit())
                     {
                         return MenuAction.Main;
@@ -101,11 +106,114 @@ namespace Console_Dungeon
             }
         }
 
+        // Map-centered view: shows the map and accepts direction commands.
+        // Choosing a direction performs the move immediately. Moving into an unexplored room
+        // automatically triggers the room's encounter and returns to the main action screen.
+        private void ShowMapView()
+        {
+            while (true)
+            {
+                string map = ScreenRenderer.RenderMap(_gameState.CurrentLevel, _gameState.Player);
+
+                string mapText =
+                    $"Map:\n{map}\n\n" +
+                    $"Choose a direction to move from the map view:\n\n" +
+                    $"  1) Move North\n" +
+                    $"  2) Move South\n" +
+                    $"  3) Move East\n" +
+                    $"  4) Move West\n" +
+                    $"  5) Back to menu\n\n";
+
+                ScreenRenderer.DrawScreen(mapText);
+
+                string input = InputHandler.GetMenuChoice();
+
+                switch (input)
+                {
+                    case "1":
+                        if (TryMove(0, -1)) return; // encounter triggered -> return to action screen
+                        break;
+                    case "2":
+                        if (TryMove(0, 1)) return;
+                        break;
+                    case "3":
+                        if (TryMove(1, 0)) return;
+                        break;
+                    case "4":
+                        if (TryMove(-1, 0)) return;
+                        break;
+                    case "5":
+                        return; // back to main game menu
+                    default:
+                        ScreenRenderer.DrawScreen("Invalid choice in map view. Press any key to continue...");
+                        InputHandler.WaitForKey();
+                        break;
+                }
+
+                // If TryMove returned false (no encounter), loop continues and map view is shown again.
+            }
+        }
+
+        // Returns true when an encounter was triggered (move into an unexplored room),
+        // which signals the caller (map view) to return to the action screen.
+        private bool TryMove(int dx, int dy)
+        {
+            int newX = _gameState.Player.PositionX + dx;
+            int newY = _gameState.Player.PositionY + dy;
+
+            if (newX < 0 || newX >= _gameState.CurrentLevel.Width || newY < 0 || newY >= _gameState.CurrentLevel.Height)
+            {
+                ScreenRenderer.DrawScreen("You cannot move that way. The path is blocked.\n\nPress any key to continue...");
+                InputHandler.WaitForKey();
+                return false;
+            }
+
+            var targetRoom = _gameState.CurrentLevel.GetRoom(newX, newY);
+
+            // Prevent entering blocked rooms (walls). Do not change position.
+            if (targetRoom.IsBlocked)
+            {
+                ScreenRenderer.DrawScreen("You cannot enter that space. A solid wall blocks your path.\n\nPress any key to continue...");
+                InputHandler.WaitForKey();
+                return false;
+            }
+
+            // Safe to move: update position
+            _gameState.Player.PositionX = newX;
+            _gameState.Player.PositionY = newY;
+
+            bool wasVisited = targetRoom.Visited;
+            string desc = wasVisited ? "You return to a familiar chamber." : targetRoom.Description;
+
+            if (!wasVisited)
+            {
+                targetRoom.Visited = true;
+                _gameState.CurrentLevel.RoomsExplored++;
+
+                // Count movement as a turn so turns are tracked when moving from the map view.
+                _gameState.TurnCount++;
+
+                // Show the room description briefly before triggering the encounter.
+                ScreenRenderer.DrawScreen($"{desc}\n\nPress any key to continue...");
+                InputHandler.WaitForKey();
+
+                // Automatically trigger the room encounter and return to the main action screen.
+                ExploreRoom();
+                return true;
+            }
+            else
+            {
+                // Visited room: show description and stay in the map view.
+                ScreenRenderer.DrawScreen($"{desc}\n\nPress any key to continue...");
+                InputHandler.WaitForKey();
+                return false;
+            }
+        }
+
         private void ExploreRoom()
         {
-            _gameState.CurrentLevel.RoomsExplored++;
-
-            // Simple random encounter (placeholder)
+            // Searching the current room can trigger an encounter; reuse existing logic but do not auto-increment RoomsExplored
+            // (RoomsExplored is handled when the player first visits a room).
             Random rng = new Random(_gameState.Seed + _gameState.TurnCount);
             int encounterType = rng.Next(1, 11); // 1-10 for weighted distribution
 
