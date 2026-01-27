@@ -1,8 +1,5 @@
-﻿using Console_Dungeon;
-using Console_Dungeon.Models;
-using System.IO;
+﻿using Console_Dungeon.Models;
 using System.Text.Json;
-using Xunit;
 
 namespace Console_Dungeon.Tests.Managers
 {

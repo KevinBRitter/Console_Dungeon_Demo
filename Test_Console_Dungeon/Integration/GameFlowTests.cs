@@ -1,5 +1,4 @@
 ﻿using Console_Dungeon.Models;
-using Xunit;
 
 namespace Console_Dungeon.Tests.Integration
 {
@@ -35,7 +34,7 @@ namespace Console_Dungeon.Tests.Integration
             gameState.TurnCount++;
 
             // Assert after combat
-            Assert.Equal(85, gameState.Player.Health);
+            Assert.Equal(90, gameState.Player.Health); // 100 + 5 defence - 15 damage 
             Assert.Equal(15, gameState.Player.Gold);
             Assert.Equal(2, gameState.CurrentLevel.RoomsExplored);
             Assert.True(gameState.Player.IsAlive);
@@ -88,18 +87,23 @@ namespace Console_Dungeon.Tests.Integration
             var gameState1 = new GameState(111);
             var gameState2 = new GameState(222);
 
+            // Make damage deterministic for this test by removing defense
+            gameState1.Player.Defense = 0;
+            // Keep default defense for gameState2, and account for it in the test
+            gameState2.Player.Defense = 10;
+
             // Act
             gameState1.Player.Gold = 100;
             gameState1.Player.TakeDamage(50);
 
             gameState2.Player.Gold = 200;
-            gameState2.Player.TakeDamage(10);
+            gameState2.Player.TakeDamage(15);
 
             // Assert - States are independent
             Assert.Equal(100, gameState1.Player.Gold);
             Assert.Equal(200, gameState2.Player.Gold);
             Assert.Equal(50, gameState1.Player.Health);
-            Assert.Equal(90, gameState2.Player.Health);
+            Assert.Equal(95, gameState2.Player.Health);
         }
     }
 }

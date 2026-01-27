@@ -1,6 +1,4 @@
-﻿using Console_Dungeon;
-using Console_Dungeon.Models;
-using Xunit;
+﻿using Console_Dungeon.Models;
 
 namespace Console_Dungeon.Tests.GameLogic
 {

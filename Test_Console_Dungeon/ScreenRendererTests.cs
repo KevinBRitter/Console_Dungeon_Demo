@@ -1,7 +1,4 @@
-using System;
-using System.IO;
 using Console_Dungeon.UI;
-using Xunit;
 
 namespace Console_Dungeon.Tests
 {

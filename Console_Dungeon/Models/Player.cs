@@ -21,6 +21,7 @@ namespace Console_Dungeon.Models
         // Progression
         public int Level { get; set; }
         public int Experience { get; set; }
+        public int Kills { get; set; }
         public int Gold { get; set; }
 
         // Constructor for new player
@@ -33,6 +34,7 @@ namespace Console_Dungeon.Models
             Attack = 10;
             Defense = 5;
             Experience = 0;
+            Kills = 0;
             Gold = 0;
             PositionX = 0;
             PositionY = 0;

@@ -1,5 +1,4 @@
 ﻿using Console_Dungeon.Models;
-using Xunit;
 
 namespace Console_Dungeon.Tests.Models
 {

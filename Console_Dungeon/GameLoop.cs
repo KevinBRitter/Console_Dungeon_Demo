@@ -186,6 +186,14 @@ namespace Console_Dungeon
             // Apply effects
             _gameState.Player.TakeDamage(damage);
             _gameState.Player.Gold += goldDropped;
+            if (enemyKey == "goblinPair")
+            {
+                _gameState.Player.Kills += 2;
+            }
+            else
+            {
+                _gameState.Player.Kills++;
+            }
 
             // Format loot message
             string lootTemplate = enemy.LootMessages[rng.Next(enemy.LootMessages.Count)];
@@ -220,6 +228,7 @@ namespace Console_Dungeon
                 $"Health: {_gameState.Player.Health}/{_gameState.Player.MaxHealth}\n" +
                 $"Attack: {_gameState.Player.Attack}\n" +
                 $"Defense: {_gameState.Player.Defense}\n" +
+                $"Enemies Defeated: {_gameState.Player.Kills}\n" +
                 $"Gold: {_gameState.Player.Gold}\n\n" +
                 $"Current Location: Dungeon Level {_gameState.CurrentLevel.LevelNumber}\n" +
                 $"Position: ({_gameState.Player.PositionX}, {_gameState.Player.PositionY})\n\n" +
@@ -264,6 +273,7 @@ namespace Console_Dungeon
                 $"  Level: {_gameState.Player.Level}\n" +
                 $"  Gold Collected: {_gameState.Player.Gold}\n" +
                 $"  Rooms Explored: {_gameState.CurrentLevel.RoomsExplored}\n" +
+                $"  Enemies Defeated: {_gameState.Player.Kills}\n" +
                 $"  Turns Survived: {_gameState.TurnCount}\n\n" +
                 $"Your adventure ends here... for now.\n\n" +
                 $"Press any key to return to the main menu...";
