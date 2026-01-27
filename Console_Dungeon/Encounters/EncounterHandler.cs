@@ -87,18 +87,35 @@ namespace Console_Dungeon.Encounters
             var encounters = EncounterManager.GetEncounters();
             int currentLevel = _gameState.CurrentLevel.LevelNumber;
 
-            // Get valid encounters for current level
-            var validEncounters = encounters.CombatEncounters
-                .Where(e => e.MinLevel <= currentLevel && e.MaxLevel >= currentLevel)
-                .ToList();
+            var currentRoom = _gameState.CurrentLevel.GetRoom(
+                _gameState.Player.PositionX,
+                _gameState.Player.PositionY);
 
-            if (validEncounters.Count == 0)
+            CombatEncounter selectedEncounter;
+
+            // Check if this is a boss room
+            if (currentRoom.IsBossRoom)
             {
-                return "An unknown creature attacks, but flees before combat begins!";
+                // TODO: Ensure only one boss per level and that it appears.  I just tested all rooms
+                // and found 0 bosses on level 1.
+                // Get boss encounter for this level
+                selectedEncounter = GetBossEncounter(encounters, currentLevel, rng);
             }
+            else
+            {
+                // Get regular encounter - MAKE SURE THIS ISN'T FILTERING OUT ALL ENCOUNTERS
+                var validEncounters = encounters.CombatEncounters
+                    .Where(e => !e.IsBoss && e.MinLevel <= currentLevel && e.MaxLevel >= currentLevel)
+                    .ToList();
 
-            // Weighted random selection
-            var selectedEncounter = SelectWeightedEncounter(validEncounters, rng);
+                if (validEncounters.Count == 0)
+                {
+                    return "An unknown creature attacks, but flees before combat begins!";
+                }
+
+                // Weighted random selection
+                selectedEncounter = SelectWeightedEncounter(validEncounters, rng);
+            }
 
             // Resolve combat
             var result = ResolveCombat(selectedEncounter, rng);
@@ -109,6 +126,33 @@ namespace Console_Dungeon.Encounters
             _gameState.Player.Kills += result.TotalKills;
 
             return result.GetFullMessage();
+        }
+        private CombatEncounter GetBossEncounter(EncounterData encounters, int currentLevel, Random rng)
+        {
+            // Get all boss encounters valid for this level
+            var validBosses = encounters.CombatEncounters
+                .Where(e => e.IsBoss && e.MinLevel <= currentLevel && e.MaxLevel >= currentLevel)
+                .ToList();
+
+            if (validBosses.Count == 0)
+            {
+                // Fallback: create a generic boss
+                return new CombatEncounter
+                {
+                    Id = "generic_boss",
+                    IsBoss = true,
+                    Enemies = new List<EnemyGroup>
+            {
+                new EnemyGroup { Type = "skeleton", Count = 5 }
+            },
+                    EncounterMessages = new List<string> { "A powerful enemy appears!" },
+                    VictoryMessages = new List<string> { "You defeat the boss! You took {totalDamage} damage!" },
+                    LootMessages = new List<string> { "You claim {totalGold} gold!" }
+                };
+            }
+
+            // Select random boss from valid options
+            return validBosses[rng.Next(validBosses.Count)];
         }
 
         private CombatEncounter SelectWeightedEncounter(List<CombatEncounter> encounters, Random rng)

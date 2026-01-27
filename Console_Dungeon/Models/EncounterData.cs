@@ -28,6 +28,7 @@
         public int Weight { get; set; } = 10;
         public int MinLevel { get; set; } = 1;
         public int MaxLevel { get; set; } = 99;
+        public bool IsBoss { get; set; } = false; // Default to false
         public List<EnemyGroup> Enemies { get; set; } = new List<EnemyGroup>();
         public List<string> EncounterMessages { get; set; } = new List<string>();
         public List<string> VictoryMessages { get; set; } = new List<string>();

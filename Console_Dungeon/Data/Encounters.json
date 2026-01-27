@@ -71,6 +71,7 @@
       "weight": 10,
       "minLevel": 1,
       "maxLevel": 3,
+      "isBoss": false,
       "enemies": [
         {
           "type": "goblin",
@@ -101,6 +102,7 @@
       "weight": 8,
       "minLevel": 1,
       "maxLevel": 5,
+      "isBoss": false,
       "enemies": [
         {
           "type": "goblin",
@@ -131,6 +133,7 @@
       "weight": 10,
       "minLevel": 2,
       "maxLevel": 6,
+      "isBoss": false,
       "enemies": [
         {
           "type": "skeleton",
@@ -161,6 +164,7 @@
       "weight": 8,
       "minLevel": 1,
       "maxLevel": 4,
+      "isBoss": false,
       "enemies": [
         {
           "type": "slime",
@@ -191,6 +195,7 @@
       "weight": 5,
       "minLevel": 5,
       "maxLevel": 10,
+      "isBoss": true,
       "enemies": [
         {
           "type": "skeleton",
@@ -221,6 +226,7 @@
       "weight": 2,
       "minLevel": 8,
       "maxLevel": 15,
+      "isBoss": true,
       "enemies": [
         {
           "type": "orcBrute",

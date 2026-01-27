@@ -127,6 +127,7 @@ namespace Console_Dungeon.Models
             BossRoomX = bossX;
             BossRoomY = bossY;
             Rooms[bossX, bossY].IsBossRoom = true;
+            Rooms[bossX, bossY].HasEncounter = true; // ENSURE THIS IS SET
 
             var rng = new Random(Seed);
             Rooms[bossX, bossY].Description = RoomDescriptionManager.GetRandomBossRoom(rng);
