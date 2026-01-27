@@ -46,25 +46,36 @@ namespace Console_Dungeon
         {
             return new EncounterData
             {
-                TreasureEncounters = new List<string>
+                TreasureEncounters = new List<string> { "You find {gold} gold coins!" },
+                EmptyRooms = new List<string> { "The room is empty." },
+                AlreadySearched = new List<string> { "You've already searched this room." },
+                NeverHadEncounter = new List<string> { "This room has nothing of value." },
+                EnemyTypes = new Dictionary<string, EnemyType>
                 {
-                    "You find {gold} gold coins!"
-                },
-                EmptyRooms = new List<string>
-                {
-                    "The room is empty."
-                },
-                Enemies = new Dictionary<string, EnemyData>
-                {
-                    ["goblin"] = new EnemyData
+                    ["goblin"] = new EnemyType
                     {
                         Name = "Goblin",
                         DamageMin = 8,
                         DamageMax = 16,
                         GoldMin = 3,
-                        GoldMax = 8,
-                        EncounterMessages = new List<string> { "A goblin attacks! You take {damage} damage." },
-                        LootMessages = new List<string> { "You find {gold} gold." }
+                        GoldMax = 8
+                    }
+                },
+                CombatEncounters = new List<CombatEncounter>
+                {
+                    new CombatEncounter
+                    {
+                        Id = "single_goblin",
+                        Weight = 10,
+                        MinLevel = 1,
+                        MaxLevel = 99,
+                        Enemies = new List<EnemyGroup>
+                        {
+                            new EnemyGroup { Type = "goblin", Count = 1 }
+                        },
+                        EncounterMessages = new List<string> { "A goblin attacks!" },
+                        VictoryMessages = new List<string> { "You defeat it but take {totalDamage} damage." },
+                        LootMessages = new List<string> { "You find {totalGold} gold." }
                     }
                 }
             };

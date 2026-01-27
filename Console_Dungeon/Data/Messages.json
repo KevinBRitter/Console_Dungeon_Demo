@@ -1,0 +1,32 @@
+﻿{
+  "rest": {
+    "healAmount": 20,
+    "message": "You rest for a moment, bandaging your wounds.\n\nRestored {amount} HP. Current HP: {current}/{max}\n\nPress any key to continue..."
+  },
+  "movement": {
+    "outOfBounds": "You cannot move that way. The path is blocked.\n\nPress any key to continue...",
+    "blocked": "You cannot enter that space. A solid wall blocks your path.\n\nPress any key to continue...",
+    "returning": "You return to a familiar chamber."
+  },
+  "menu": {
+    "invalidAction": "Invalid action. Press any key to continue...",
+    "invalidMapChoice": "Invalid choice in map view. Press any key to continue...",
+    "confirmExit": "Are you sure you want to return to the main menu?\nYour progress will be lost until save functionality is implemented.\n\n  1) Yes, return to menu\n  2) No, continue playing\n\n"
+  },
+  "death": {
+    "title": "=== You Have Fallen ===",
+    "message": "{name} has been defeated in the depths of the dungeon.\n\nFinal Statistics:\n  Level: {level}\n  Gold Collected: {gold}\n  Rooms Explored: {rooms}\n  Enemies Defeated: {kills}\n  Turns Survived: {turns}\n\nYour adventure ends here... for now.\n\nPress any key to return to the main menu..."
+  },
+  "status": {
+    "title": "=== Character Status ===",
+    "template": "Name: {name}\nLevel: {level}\nExperience: {experience}\n\nHealth: {health}/{maxHealth}\nAttack: {attack}\nDefense: {defense}\nEnemies Defeated: {kills}\nGold: {gold}\n\nCurrent Location: Dungeon Level {dungeonLevel}\nPosition: ({x}, {y})\n\nTurns Taken: {turns}\nSession Started: {sessionStart}\n\nPress any key to continue..."
+  },
+  "mapView": {
+    "title": "Map:",
+    "actions": "Choose a direction to move from the map view:\n\n  1) Move North\n  2) Move South\n  3) Move East\n  4) Move West\n  5) Back to menu\n\n"
+  },
+  "mainActions": {
+    "header": "What will you do?\n\n",
+    "options": "  1) View Map (choose direction from the map)\n  2) Search current room (may trigger events)\n  3) Rest (restore 20 HP)\n  4) Check status\n  5) Return to Main Menu\n\n"
+  }
+}

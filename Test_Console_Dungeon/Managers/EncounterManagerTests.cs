@@ -1,5 +1,6 @@
 ﻿using Console_Dungeon.Models;
 using System.Text.Json;
+using Xunit;
 
 namespace Console_Dungeon.Tests.Managers
 {
@@ -33,17 +34,40 @@ namespace Console_Dungeon.Tests.Managers
                     "The room is empty.",
                     "Nothing here."
                 },
-                Enemies = new Dictionary<string, EnemyData>
+                AlreadySearched = new List<string>
                 {
-                    ["testGoblin"] = new EnemyData
+                    "You've already searched this room."
+                },
+                NeverHadEncounter = new List<string>
+                {
+                    "This room has nothing of value."
+                },
+                EnemyTypes = new Dictionary<string, EnemyType>
+                {
+                    ["testGoblin"] = new EnemyType
                     {
                         Name = "Test Goblin",
                         DamageMin = 5,
                         DamageMax = 10,
                         GoldMin = 1,
-                        GoldMax = 5,
-                        EncounterMessages = new List<string> { "A test goblin attacks! {damage} damage." },
-                        LootMessages = new List<string> { "You loot {gold} gold." }
+                        GoldMax = 5
+                    }
+                },
+                CombatEncounters = new List<CombatEncounter>
+                {
+                    new CombatEncounter
+                    {
+                        Id = "test_single_goblin",
+                        Weight = 10,
+                        MinLevel = 1,
+                        MaxLevel = 5,
+                        Enemies = new List<EnemyGroup>
+                        {
+                            new EnemyGroup { Type = "testGoblin", Count = 1 }
+                        },
+                        EncounterMessages = new List<string> { "A test goblin attacks!" },
+                        VictoryMessages = new List<string> { "You defeat it but take {totalDamage} damage." },
+                        LootMessages = new List<string> { "You loot {totalGold} gold." }
                     }
                 }
             };
@@ -63,8 +87,11 @@ namespace Console_Dungeon.Tests.Managers
             Assert.NotNull(encounters);
             Assert.Equal(2, encounters.TreasureEncounters.Count);
             Assert.Equal(2, encounters.EmptyRooms.Count);
-            Assert.Single(encounters.Enemies);
-            Assert.True(encounters.Enemies.ContainsKey("testGoblin"));
+            Assert.Single(encounters.AlreadySearched);
+            Assert.Single(encounters.NeverHadEncounter);
+            Assert.Single(encounters.EnemyTypes);
+            Assert.Single(encounters.CombatEncounters);
+            Assert.True(encounters.EnemyTypes.ContainsKey("testGoblin"));
         }
 
         [Fact]
@@ -78,7 +105,8 @@ namespace Console_Dungeon.Tests.Managers
             Assert.NotNull(encounters);
             Assert.NotEmpty(encounters.TreasureEncounters);
             Assert.NotEmpty(encounters.EmptyRooms);
-            Assert.NotEmpty(encounters.Enemies);
+            Assert.NotEmpty(encounters.EnemyTypes);
+            Assert.NotEmpty(encounters.CombatEncounters);
         }
 
         [Fact]
@@ -119,14 +147,14 @@ namespace Console_Dungeon.Tests.Managers
         }
 
         [Fact]
-        public void EnemyData_HasCorrectProperties()
+        public void EnemyType_HasCorrectProperties()
         {
             // Arrange
             EncounterManager.LoadEncounters(TestEncountersFile);
             var encounters = EncounterManager.GetEncounters();
 
             // Act
-            var goblin = encounters.Enemies["testGoblin"];
+            var goblin = encounters.EnemyTypes["testGoblin"];
 
             // Assert
             Assert.Equal("Test Goblin", goblin.Name);
@@ -134,8 +162,68 @@ namespace Console_Dungeon.Tests.Managers
             Assert.Equal(10, goblin.DamageMax);
             Assert.Equal(1, goblin.GoldMin);
             Assert.Equal(5, goblin.GoldMax);
-            Assert.Single(goblin.EncounterMessages);
-            Assert.Single(goblin.LootMessages);
+        }
+
+        [Fact]
+        public void CombatEncounter_HasCorrectStructure()
+        {
+            // Arrange
+            EncounterManager.LoadEncounters(TestEncountersFile);
+            var encounters = EncounterManager.GetEncounters();
+
+            // Act
+            var combatEncounter = encounters.CombatEncounters[0];
+
+            // Assert
+            Assert.Equal("test_single_goblin", combatEncounter.Id);
+            Assert.Equal(10, combatEncounter.Weight);
+            Assert.Equal(1, combatEncounter.MinLevel);
+            Assert.Equal(5, combatEncounter.MaxLevel);
+            Assert.Single(combatEncounter.Enemies);
+            Assert.Equal("testGoblin", combatEncounter.Enemies[0].Type);
+            Assert.Equal(1, combatEncounter.Enemies[0].Count);
+            Assert.Single(combatEncounter.EncounterMessages);
+            Assert.Single(combatEncounter.VictoryMessages);
+            Assert.Single(combatEncounter.LootMessages);
+        }
+
+        [Fact]
+        public void EnemyGroup_HasCorrectProperties()
+        {
+            // Arrange
+            EncounterManager.LoadEncounters(TestEncountersFile);
+            var encounters = EncounterManager.GetEncounters();
+
+            // Act
+            var enemyGroup = encounters.CombatEncounters[0].Enemies[0];
+
+            // Assert
+            Assert.Equal("testGoblin", enemyGroup.Type);
+            Assert.Equal(1, enemyGroup.Count);
+        }
+
+        [Fact]
+        public void AlreadySearched_HasMessages()
+        {
+            // Arrange
+            EncounterManager.LoadEncounters(TestEncountersFile);
+            var encounters = EncounterManager.GetEncounters();
+
+            // Assert
+            Assert.NotEmpty(encounters.AlreadySearched);
+            Assert.Contains("You've already searched this room.", encounters.AlreadySearched);
+        }
+
+        [Fact]
+        public void NeverHadEncounter_HasMessages()
+        {
+            // Arrange
+            EncounterManager.LoadEncounters(TestEncountersFile);
+            var encounters = EncounterManager.GetEncounters();
+
+            // Assert
+            Assert.NotEmpty(encounters.NeverHadEncounter);
+            Assert.Contains("This room has nothing of value.", encounters.NeverHadEncounter);
         }
     }
 }

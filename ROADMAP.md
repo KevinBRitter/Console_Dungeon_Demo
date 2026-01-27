@@ -41,7 +41,8 @@ Goal: Transition from menus to a minimal but complete playable loop.
 
 ## Phase 2 — Minimal Dungeon & Movement
 
-Goal: Let the player exist somewhere and move meaningfully.
+Goal: Let the player exist somewhere and move meaningfully. 
+`Implemented: 01/26/26 - KR`
 
 - Dungeon Representation
     - Start with a small fixed grid (e.g., 5×5) or linear rooms.

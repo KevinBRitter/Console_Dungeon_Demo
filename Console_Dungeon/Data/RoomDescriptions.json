@@ -1,0 +1,58 @@
+﻿{
+  "standardRooms": [
+    "A cold stone chamber.",
+    "A dark corridor opens before you.",
+    "An ancient hall, worn by time.",
+    "A damp room with water dripping from the ceiling.",
+    "A dusty chamber filled with cobwebs.",
+    "A narrow passage carved from solid rock.",
+    "A torch-lit room with flickering shadows.",
+    "A circular room with strange symbols on the walls.",
+    "An abandoned guard post, long forgotten.",
+    "A cramped alcove with rusted chains.",
+    "Cracked tiles cover the floor of this decaying room.",
+    "A small chamber with a collapsed ceiling.",
+    "Stone pillars support this dimly lit hall.",
+    "The walls here are covered in ancient graffiti.",
+    "A musty room with rotting wooden beams.",
+    "Moonlight filters through cracks in the ceiling.",
+    "This chamber echoes with your footsteps.",
+    "A narrow space between two towering walls.",
+    "The floor is uneven and treacherous here.",
+    "Faded murals depict long-forgotten battles."
+  ],
+  "bossRooms": [
+    "A massive chamber looms before you. The air crackles with dark energy. This is clearly the lair of something powerful...",
+    "An enormous throne room stretches before you. Shadows dance ominously on the walls. A great evil dwells here.",
+    "You enter a vast hall. Ancient bones litter the floor. Something terrible awaits in the darkness ahead.",
+    "The chamber opens into a cavernous space. The air is thick with malevolence. This is a place of power and death.",
+    "A grand arena lies before you. Bloodstains mark the floor. Many warriors have fallen here before you."
+  ],
+  "blockedRooms": [
+    "Stone wall ({x},{y}).",
+    "Solid rock blocks the way.",
+    "An impenetrable barrier.",
+    "Collapsed passage.",
+    "Rubble-filled corridor."
+  ],
+  "specialRooms": {
+    "treasure": [
+      "A glittering vault catches your eye.",
+      "Gold coins are scattered across the floor here.",
+      "An old treasure chest sits in the corner.",
+      "This appears to be an ancient treasure room."
+    ],
+    "rest": [
+      "A peaceful alcove with a small fountain.",
+      "This chamber feels strangely safe and calm.",
+      "A quiet room with benches carved from stone.",
+      "An abandoned campsite from previous adventurers."
+    ],
+    "trap": [
+      "Something about this room seems dangerous...",
+      "You notice strange mechanisms on the walls.",
+      "The floor here looks unstable.",
+      "This room has an ominous feeling."
+    ]
+  }
+}
