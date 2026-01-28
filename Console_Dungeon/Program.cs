@@ -27,14 +27,33 @@ class Program
                     action = playMenu.Show(); // Assume PlayMenu handles its own loop and returns to MainMenu when done
                     break;
 
-                case MenuAction.NewGame:
-                    // Initialize new game state
-                    int seed = Environment.TickCount; // Use timestamp as seed
-                    currentGameState = new GameState(seed);
+                case MenuAction.CharacterCreation:
+                    var charCreationMenu = new CharacterCreationMenu();
+                    action = charCreationMenu.Show();
 
-                    // Start game loop
-                    var newGameLoop = new GameLoop(currentGameState);
-                    action = newGameLoop.Run();
+                    // If character was created, start new game with that character
+                    if (action == MenuAction.NewGame)
+                    {
+                        int seed = Environment.TickCount;
+                        currentGameState = new GameState(seed);
+
+                        // Replace default player with created character
+                        currentGameState.Player = new Player(
+                            charCreationMenu.CreatedCharacterName,
+                            charCreationMenu.CreatedCharacterClass);
+
+                        var newGameLoop = new GameLoop(currentGameState);
+                        action = newGameLoop.Run();
+                    }
+                    break;
+
+                case MenuAction.NewGame:
+                    // Direct new game (shouldn't happen now, but keep as fallback)
+                    int fallbackSeed = Environment.TickCount;
+                    currentGameState = new GameState(fallbackSeed);
+
+                    var fallbackGameLoop = new GameLoop(currentGameState);
+                    action = fallbackGameLoop.Run();
                     break;
 
                 case MenuAction.ContinueGame:

@@ -11,27 +11,22 @@ namespace Console_Dungeon.Menus
             string menuText =
                 "Play\n\n" +
                 "  1) New Adventure\n" +
-                "  2) Continue\n" +
+                "  2) Continue (Not yet implemented)\n" +
                 "  3) Return\n\n";
 
-            // use defaults from ScreenRenderer
             ScreenRenderer.DrawScreen(menuText);
-
             string input = InputHandler.GetMenuChoice();
 
             switch (input)
             {
                 case "1":
-                    return MenuAction.NewGame;
-
+                    return MenuAction.CharacterCreation; // Route to character creation
                 case "2":
                     ContinueNotAvailable();
-                    return MenuAction.Play; // Stay in Play menu
-
+                    return MenuAction.Play;
                 case "3":
                     ReturnToMain();
                     return MenuAction.Main;
-
                 default:
                     InvalidChoice();
                     return MenuAction.Play;

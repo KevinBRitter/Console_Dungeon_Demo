@@ -1,4 +1,5 @@
 ﻿using Console_Dungeon.Generation;
+using Console_Dungeon.Managers;
 
 namespace Console_Dungeon.Models
 {

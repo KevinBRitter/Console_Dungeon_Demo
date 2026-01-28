@@ -1,4 +1,6 @@
-﻿namespace Console_Dungeon.Tests.Managers
+﻿using Console_Dungeon.Managers;
+
+namespace Console_Dungeon.Tests.Managers
 {
     public class RoomDescriptionManagerTests
     {

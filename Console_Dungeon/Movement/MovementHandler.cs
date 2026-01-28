@@ -1,5 +1,6 @@
 ﻿using Console_Dungeon.Encounters;
 using Console_Dungeon.Input;
+using Console_Dungeon.Managers;
 using Console_Dungeon.Models;
 using Console_Dungeon.UI;
 

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace Console_Dungeon
+namespace Console_Dungeon.Managers
 {
     public class EncounterManager
     {

@@ -2,6 +2,7 @@
 using Console_Dungeon.Encounters;
 using Console_Dungeon.Enums;
 using Console_Dungeon.Input;
+using Console_Dungeon.Managers;
 using Console_Dungeon.Models;
 using Console_Dungeon.Movement;
 using Console_Dungeon.UI;
@@ -21,7 +22,8 @@ namespace Console_Dungeon
             // Load configuration
             EncounterManager.LoadEncounters();
             MessageManager.LoadMessages();
-            RoomDescriptionManager.LoadDescriptions(); // NEW
+            RoomDescriptionManager.LoadDescriptions();
+            CharacterClassManager.LoadClasses(); // NEW
 
             // Initialize handlers
             _encounterHandler = new EncounterHandler(gameState);

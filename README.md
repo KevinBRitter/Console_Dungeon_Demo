@@ -36,15 +36,52 @@ Planned:
 - `MainMenu` instantiates `PlayMenu` and `OptionsMenu` looping while each menu returns an appropriate `MenuAction`, keeping control flow clear and easy to extend.
 
 ## Project structure (important files)
-- `Program.cs` — application entry and main loop.
-- `Menus/IMenu.cs` — menu interface.
-- `Menus/MainMenu.cs` — entry menu; instantiates other menus.
-- `Menus/OptionsMenu.cs` — options submenu with audio and controls settings.
-- `Menus/PlayMenu.cs` — play submenu with New/Continue/Return options.
-- `UI/ScreenRenderer.cs` — draws framed screens and handles layout.
-- `UI/TextFormatter.cs` — wraps text to fit the screen width.
-- `Input/InputHandler.cs` — central place for console input.
-- `Enums/MenuAction.cs` - enum representing possible menu actions.
+Console_Dungeon/
+├── Actions/
+│   ├── IGameAction.cs
+│   ├── RestAction.cs
+│   └── ShowStatusAction.cs
+├── Data/
+│   ├── CharacterClasses.json
+│   ├── Encounters.json
+│   ├── Messages.json
+│   └── RoomDescriptions.json
+├── Encounters/
+│   └── EncounterHandler.cs
+├── Enums/
+│   ├── `MenuAction.cs` - enum representing possible menu actions.
+│   └── PlayerClass.cs
+├── Generation/
+│   └── LevelGenerator.cs
+├── Input/
+│   └── `InputHandler.cs` — central place for console input.
+├── Managers/
+│   ├── CharacterClassManager.cs
+│   ├── EncounterManager.cs
+│   ├── MessageManager.cs
+│   └── RoomDescriptionManager.cs
+├── Menus/
+│   ├── CharacterCreationMenu.cs
+│   ├── `IMenu.cs` — menu interface.
+│   ├── `MainMenu.cs` — entry menu; instantiates other menus.
+│   ├── `OptionsMenu.cs` — options submenu with audio and controls settings.
+│   └── `PlayMenu.cs` — play submenu with New/Continue/Return options.
+├── Models/
+│   ├── CharacterClassData.cs
+│   ├── CombatResult.cs
+│   ├── DungeonLevel.cs
+│   ├── EncounterData.cs
+│   ├── GameState.cs
+│   ├── Player.cs
+│   └── Room.cs
+├── Movement/
+│   └── MovementHandler.cs
+├── UI/
+│   ├── `ScreenRenderer.cs` — draws framed screens and handles layout.
+│   └── `TextFormatter.cs` — wraps text to fit the screen width.
+├── DebugLogger.cs
+├── GameLoop.cs
+└── `Program.cs` — application entry and main loop.
 
 ## Technical notes for contributors
 - Language: C# 12; Target: .NET 8.0

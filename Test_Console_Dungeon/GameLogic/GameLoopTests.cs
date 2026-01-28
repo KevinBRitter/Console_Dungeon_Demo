@@ -1,4 +1,5 @@
-﻿using Console_Dungeon.Models;
+﻿using Console_Dungeon.Managers;
+using Console_Dungeon.Models;
 
 namespace Console_Dungeon.Tests.GameLogic
 {

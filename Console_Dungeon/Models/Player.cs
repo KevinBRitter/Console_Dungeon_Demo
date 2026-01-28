@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Console_Dungeon.Enums;
+using Console_Dungeon.Managers;
 
 namespace Console_Dungeon.Models
 {
@@ -7,46 +8,88 @@ namespace Console_Dungeon.Models
     {
         // Identity
         public string Name { get; set; }
+        public PlayerClass Class { get; set; }
 
-        // Stats
+        // Core Stats
         public int Health { get; set; }
         public int MaxHealth { get; set; }
         public int Attack { get; set; }
         public int Defense { get; set; }
 
-        // Position in dungeon
+        // Optional Stats
+        public int Stamina { get; set; }
+        public int MaxStamina { get; set; }
+        public int Mana { get; set; }
+        public int MaxMana { get; set; }
+
+        // Position
         public int PositionX { get; set; }
         public int PositionY { get; set; }
 
         // Progression
         public int Level { get; set; }
         public int Experience { get; set; }
+        public int ExperienceToNextLevel { get; set; }
         public int Gold { get; set; }
-
-        // Kill count (tracked by combat)
         public int Kills { get; set; }
 
-        // Constructor for new player
-        public Player(string name)
+        // Constructor with class
+        public Player(string name, PlayerClass playerClass)
         {
             Name = name;
+            Class = playerClass;
             Level = 1;
-            MaxHealth = 100;
-            Health = MaxHealth;
-            Attack = 10;
-            Defense = 5;
             Experience = 0;
+            ExperienceToNextLevel = 100;
             Gold = 0;
+            Kills = 0;
             PositionX = 0;
             PositionY = 0;
-            Kills = 0;
+
+            // Load stats from JSON
+            ApplyClassStats(playerClass);
         }
 
-        // Parameterless constructor for deserialization
+        // Backwards compatibility constructor
+        public Player(string name) : this(name, PlayerClass.Warrior)
+        {
+        }
+
+        // Deserialization constructor
         public Player()
         {
             Name = "Adventurer";
-            Kills = 0;
+            Class = PlayerClass.Warrior;
+            ApplyClassStats(PlayerClass.Warrior);
+        }
+
+        private void ApplyClassStats(PlayerClass playerClass)
+        {
+            var classData = CharacterClassManager.GetClassDataByEnum(playerClass);
+
+            if (classData != null)
+            {
+                MaxHealth = classData.StartingStats.MaxHealth;
+                Health = MaxHealth;
+                Attack = classData.StartingStats.Attack;
+                Defense = classData.StartingStats.Defense;
+                MaxStamina = classData.StartingStats.MaxStamina;
+                Stamina = MaxStamina;
+                MaxMana = classData.StartingStats.MaxMana;
+                Mana = MaxMana;
+            }
+            else
+            {
+                // Fallback if class not found
+                MaxHealth = 100;
+                Health = MaxHealth;
+                Attack = 10;
+                Defense = 5;
+                MaxStamina = 100;
+                Stamina = MaxStamina;
+                MaxMana = 0;
+                Mana = 0;
+            }
         }
 
         // Helper methods
@@ -62,5 +105,39 @@ namespace Console_Dungeon.Models
         {
             Health = Math.Min(MaxHealth, Health + amount);
         }
-    }
+
+        public void GainExperience(int amount)
+        {
+            Experience += amount;
+
+            while (Experience >= ExperienceToNextLevel)
+            {
+                LevelUp();
+            }
+        }
+
+        private void LevelUp()
+        {
+            var classData = CharacterClassManager.GetClassDataByEnum(Class);
+
+            if (classData != null)
+            {
+                Level++;
+                Experience -= ExperienceToNextLevel;
+                ExperienceToNextLevel = (int)(ExperienceToNextLevel * 1.5f);
+
+                // Apply level up gains from JSON
+                MaxHealth += classData.LevelUpGains.MaxHealth;
+                Attack += classData.LevelUpGains.Attack;
+                Defense += classData.LevelUpGains.Defense;
+                MaxStamina += classData.LevelUpGains.MaxStamina;
+                MaxMana += classData.LevelUpGains.MaxMana;
+
+                // Restore to full on level up
+                Health = MaxHealth;
+                Stamina = MaxStamina;
+                Mana = MaxMana;
+            }
+        }
+    }        
 }

@@ -1,5 +1,6 @@
 ﻿namespace Console_Dungeon.Enums
 {
+    [Serializable]
     public enum MenuAction
     {
         Main,
@@ -10,6 +11,7 @@
         AudioOptions,
         ControlOptions,
         NewGame,
-        ContinueGame
+        ContinueGame,
+        CharacterCreation
     }
 }

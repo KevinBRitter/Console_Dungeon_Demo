@@ -1,0 +1,84 @@
+﻿{
+  "classes": [
+    {
+      "id": "warrior",
+      "name": "Warrior",
+      "description": "A sturdy fighter with high health and balanced offense/defense.",
+      "flavorText": "Warriors are masters of combat, trained in the art of sword and shield. They can withstand tremendous punishment while dealing consistent damage.",
+      "startingStats": {
+        "maxHealth": 120,
+        "attack": 12,
+        "defense": 8,
+        "maxStamina": 100,
+        "maxMana": 0
+      },
+      "levelUpGains": {
+        "maxHealth": 15,
+        "attack": 2,
+        "defense": 2,
+        "maxStamina": 10,
+        "maxMana": 0
+      }
+    },
+    {
+      "id": "rogue",
+      "name": "Rogue",
+      "description": "A nimble combatant with high damage but lower survivability.",
+      "flavorText": "Rogues strike from the shadows with deadly precision. They sacrifice durability for devastating attacks and swift movements.",
+      "startingStats": {
+        "maxHealth": 90,
+        "attack": 15,
+        "defense": 5,
+        "maxStamina": 120,
+        "maxMana": 0
+      },
+      "levelUpGains": {
+        "maxHealth": 10,
+        "attack": 3,
+        "defense": 1,
+        "maxStamina": 15,
+        "maxMana": 0
+      }
+    },
+    {
+      "id": "mage",
+      "name": "Mage",
+      "description": "A wielder of arcane magic with powerful spells but fragile defenses.",
+      "flavorText": "Mages harness the raw power of the arcane, channeling devastating magical energies. Their bodies are frail, but their spells are unmatched.",
+      "startingStats": {
+        "maxHealth": 70,
+        "attack": 8,
+        "defense": 3,
+        "maxStamina": 0,
+        "maxMana": 150
+      },
+      "levelUpGains": {
+        "maxHealth": 8,
+        "attack": 1,
+        "defense": 1,
+        "maxStamina": 0,
+        "maxMana": 20
+      }
+    },
+    {
+      "id": "cleric",
+      "name": "Cleric",
+      "description": "A holy warrior who can both fight and heal.",
+      "flavorText": "Clerics blend martial prowess with divine magic. They are versatile adventurers capable of both dealing damage and sustaining themselves.",
+      "startingStats": {
+        "maxHealth": 100,
+        "attack": 10,
+        "defense": 6,
+        "maxStamina": 80,
+        "maxMana": 100
+      },
+      "levelUpGains": {
+        "maxHealth": 12,
+        "attack": 2,
+        "defense": 2,
+        "maxStamina": 8,
+        "maxMana": 10
+      }
+    }
+  ]
+}
