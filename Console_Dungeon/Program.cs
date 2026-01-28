@@ -37,8 +37,9 @@ class Program
                         int seed = Environment.TickCount;
                         currentGameState = new GameState(seed);
 
-                        // Replace default player with created character
-                        currentGameState.Player = new Player(
+                        // Re-use the existing Player instance created by GameState.
+                        // Preserve the starting Position set in GameState and update identity/class/stats.
+                        currentGameState.Player.SetNameAndClass(
                             charCreationMenu.CreatedCharacterName,
                             charCreationMenu.CreatedCharacterClass);
 

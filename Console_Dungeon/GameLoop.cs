@@ -148,9 +148,51 @@ namespace Console_Dungeon
             int nextLevelNumber = _gameState.CurrentLevel.LevelNumber + 1;
             _gameState.CurrentLevel = new DungeonLevel(nextLevelNumber, _gameState.Seed + nextLevelNumber);
 
-            // Reset player position to start
-            _gameState.Player.PositionX = 0;
-            _gameState.Player.PositionY = 0;
+            // Place player at new level start (center of generated level) and ensure the starting room is valid
+            _gameState.Player.PositionX = _gameState.CurrentLevel.Width / 2;
+            _gameState.Player.PositionY = _gameState.CurrentLevel.Height / 2;
+
+            var startRoom = _gameState.CurrentLevel.GetRoom(_gameState.Player.PositionX, _gameState.Player.PositionY);
+
+            // Fallback: if center is blocked, find the first walkable tile
+            if (startRoom.IsBlocked)
+            {
+                bool found = false;
+                for (int x = 0; x < _gameState.CurrentLevel.Width && !found; x++)
+                {
+                    for (int y = 0; y < _gameState.CurrentLevel.Height && !found; y++)
+                    {
+                        var newStartRoom = _gameState.CurrentLevel.GetRoom(x, y);
+                        if (!newStartRoom.IsBlocked)
+                        {
+                            _gameState.Player.PositionX = x;
+                            _gameState.Player.PositionY = y;
+                            startRoom = newStartRoom;
+                            found = true;
+                        }
+                    }
+                }
+            }
+
+            // Mark the start room visited and reset RoomsExplored for the new level
+            if (!startRoom.IsBlocked && !startRoom.Visited)
+            {
+                startRoom.Visited = true;
+                _gameState.CurrentLevel.RoomsExplored = 1;
+            }
+            else
+            {
+                // Ensure RoomsExplored is at least 1 if there's any walkable room
+                _gameState.CurrentLevel.RoomsExplored = Math.Max(1, _gameState.CurrentLevel.RoomsExplored);
+            }
+
+            // Defensive: ensure the starting room is not a boss room (generator should avoid this but be safe)
+            if (startRoom.IsBossRoom)
+            {
+                DebugLogger.Log("WARNING: Starting room for new level was marked as boss room; clearing boss flag.");
+                startRoom.IsBossRoom = false;
+                startRoom.HasEncounter = false;
+            }
 
             // Optional: Heal player partially
             int healAmount = _gameState.Player.MaxHealth / 4; // 25% heal

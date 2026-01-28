@@ -104,6 +104,17 @@ namespace Console_Dungeon.Models
             }
         }
 
+        // Public helper to update identity/class while preserving the existing Player instance.
+        // This lets callers reuse the GameState-created Player (and its Position) instead of replacing it.
+        public void SetNameAndClass(string name, PlayerClass playerClass)
+        {
+            Name = name;
+            Class = playerClass;
+
+            // Re-apply class stats so the existing instance gets correct starting stats.
+            ApplyClassStats(playerClass);
+        }
+
         // Helper methods
         public bool IsAlive => Health > 0;
 
