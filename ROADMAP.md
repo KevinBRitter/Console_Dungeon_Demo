@@ -65,6 +65,7 @@ Goal: Let the player exist somewhere and move meaningfully.
 ## Phase 3 — Player Identity & Progression
 
 Goal: Give the player stats and decisions that matter.
+`Implemented: 01/27/26 - KR`
 
 - Player Stats
     - Health, max health
@@ -190,3 +191,30 @@ These are intentionally small but impactful and fit well before “full systems�
 <-- Back to [README](README.md#roadmap)
 
 <-- Back to [top](#top)
+
+# TODO Summarize / organize this and fit into previous enhancement ideas sections
+### Phase 3.5 — Character Creation Polish (Quick Wins)
+- [ ] Starting backgrounds (JSON-based)
+- [ ] XP progress bar in status screen
+- [ ] Level-up celebration screen
+- [ ] Quick start / random character option
+- [ ] Character creation tutorial tips
+
+### Phase 4.5 — Character Abilities (After Combat Polish)
+- [ ] Simple active abilities per class (1-2 skills)
+- [ ] Ability cooldowns and resource costs
+- [ ] Skill descriptions in JSON
+- [ ] Combat menu with ability choices
+
+### Phase 7 — Meta Progression
+- [ ] Death statistics tracking
+- [ ] Achievement system
+- [ ] Meta-progression unlocks
+- [ ] Class-specific achievements
+- [ ] Local leaderboards
+
+### Phase 8 — Advanced Progression (Polish)
+- [ ] Specializations / subclasses at level 5
+- [ ] Equipment system with stat bonuses
+- [ ] Talent trees (simple branching)
+- [ ] Character titles and cosmetics
