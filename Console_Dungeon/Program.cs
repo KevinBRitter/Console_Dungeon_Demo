@@ -7,17 +7,9 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Set console window size
-        try
-        {
-            Console.SetWindowSize(80, 32);  // Width: 80, Height: 30
-            Console.SetBufferSize(80, 32);  // Match buffer to window size
-        }
-        catch (PlatformNotSupportedException)
-        {
-            // Some platforms (like Linux/Mac terminals) don't support SetWindowSize
-            // The game will still work, user just needs to resize manually
-        }
+        // Ensure console is at a usable size before starting UI
+        EnsureConsoleSize(minWidth: 80, minHeight: 32);
+
         GameState? currentGameState = null;
         IMenu currentMenu = new MainMenu();
         MenuAction action = currentMenu.Show();
@@ -62,6 +54,52 @@ class Program
                 default:
                     continue; // Stay in the current menu (MainMenu)
             }
+        }
+    }
+
+    private static void EnsureConsoleSize(int minWidth = 80, int minHeight = 32)
+    {
+        try
+        {
+            // On Windows, buffer must be >= desired window size. Increase buffer first,
+            // then set window size, then ensure buffer is at least window size.
+            int desiredBufferWidth = Math.Max(Console.BufferWidth, minWidth);
+            int desiredBufferHeight = Math.Max(Console.BufferHeight, minHeight);
+
+            if (Console.BufferWidth < desiredBufferWidth || Console.BufferHeight < desiredBufferHeight)
+            {
+                Console.SetBufferSize(desiredBufferWidth, desiredBufferHeight);
+            }
+
+            int windowWidth = Math.Max(Console.WindowWidth, minWidth);
+            int windowHeight = Math.Max(Console.WindowHeight, minHeight);
+
+            Console.SetWindowSize(windowWidth, windowHeight);
+
+            // Make sure buffer still at least equals window
+            if (Console.BufferWidth < Console.WindowWidth || Console.BufferHeight < Console.WindowHeight)
+            {
+                Console.SetBufferSize(Math.Max(Console.BufferWidth, Console.WindowWidth), Math.Max(Console.BufferHeight, Console.WindowHeight));
+            }
+
+            // Reset position to top-left (some hosts keep previous position)
+            Console.SetWindowPosition(0, 0);
+        }
+        catch (PlatformNotSupportedException)
+        {
+            // Console sizing not supported on this platform — renderer will adapt
+        }
+        catch (IOException)
+        {
+            // Host refused size changes (e.g. some terminals) — ignore and continue
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            // Requested sizes out of host bounds — ignore
+        }
+        catch
+        {
+            // Any other failure — swallow so app still runs
         }
     }
 }

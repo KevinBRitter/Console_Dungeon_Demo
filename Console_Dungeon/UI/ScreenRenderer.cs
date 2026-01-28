@@ -10,8 +10,11 @@ namespace Console_Dungeon.UI
         // Default remains the real console output.
         public static TextWriter Output = Console.Out;
 
-        private const int ScreenWidth = 80;  // Standard console width, a little wide but saves room for minimap if needed
-        private const int ScreenHeight = 30; // 25 fits, but doesn't leave room for user input
+        // Defaults used when Console.WindowWidth/Height are unavailable or can't be relied on.
+        private const int DefaultScreenWidth = 80;  // target console width
+        private const int DefaultScreenHeight = 30; // target console height
+
+        // Padding and layout constants
         private const int PaddingLeft = 4; // Leave room for border plus some padding white space
         private const int PaddingRight = 4;
         private const int PaddingTop = 1; // Leave room for border no white space
@@ -20,6 +23,37 @@ namespace Console_Dungeon.UI
         // Default header/footer (used when caller passes null).
         private const string DefaultHeader = "Console Dungeon";
         private const string DefaultFooter = "a demo project by Kevin Ritter";
+
+        // Compute effective screen size: prefer actual console size (if available),
+        // otherwise fall back to defaults. Always return at least the default to keep layout deterministic.
+        private static int ScreenWidth => GetEffectiveConsoleWidth();
+        private static int ScreenHeight => GetEffectiveConsoleHeight();
+
+        private static int GetEffectiveConsoleWidth()
+        {
+            try
+            {
+                int w = Console.WindowWidth;
+                return Math.Max(DefaultScreenWidth, w);
+            }
+            catch
+            {
+                return DefaultScreenWidth;
+            }
+        }
+
+        private static int GetEffectiveConsoleHeight()
+        {
+            try
+            {
+                int h = Console.WindowHeight;
+                return Math.Max(DefaultScreenHeight, h);
+            }
+            catch
+            {
+                return DefaultScreenHeight;
+            }
+        }
 
         // Backwards-compatible single-string API
         public static void DrawScreen(string text)
@@ -35,6 +69,10 @@ namespace Console_Dungeon.UI
         {
             int textWidth = ScreenWidth - 2 - PaddingLeft - PaddingRight;
             int textHeight = ScreenHeight - 2 - PaddingTop - PaddingBottom;
+
+            // Ensure minimum sensible content area so layout code doesn't break
+            textWidth = Math.Max(10, textWidth);
+            textHeight = Math.Max(3, textHeight);
 
             // Interpret header/footer null as defaults, empty string as "no section"
             List<string> headerLines;
@@ -186,9 +224,10 @@ namespace Console_Dungeon.UI
         {
             int innerWidth = ScreenWidth - 2;
 
+            // Ensure the padded text exactly fills the inner width
             string paddedText =
                 new string(' ', PaddingLeft) +
-                text.PadRight(innerWidth - PaddingLeft - PaddingRight) +
+                text.PadRight(Math.Max(0, innerWidth - PaddingLeft - PaddingRight)).Substring(0, Math.Max(0, innerWidth - PaddingLeft - PaddingRight)) +
                 new string(' ', PaddingRight);
 
             Output.WriteLine("*" + paddedText + "*");
