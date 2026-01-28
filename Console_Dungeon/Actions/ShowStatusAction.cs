@@ -9,6 +9,8 @@ namespace Console_Dungeon.Actions
     {
         public void Execute(GameState gameState)
         {
+            string xpBar = gameState.Player.GetXPProgressBar(30);
+
             string statusText = MessageManager.GetMessage("status.template",
                 ("name", gameState.Player.Name),
                 ("level", gameState.Player.Level),
@@ -25,7 +27,13 @@ namespace Console_Dungeon.Actions
                 ("turns", gameState.TurnCount),
                 ("sessionStart", gameState.CreatedAt.ToString("g")));
 
+            // Add XP progress bar after experience
             string fullStatus = $"{MessageManager.GetMessage("status.title")}\n\n{statusText}";
+
+            // Insert XP bar after experience line
+            fullStatus = fullStatus.Replace(
+                $"Experience: {gameState.Player.Experience}",
+                $"Experience: {gameState.Player.Experience}\n{xpBar}");
 
             ScreenRenderer.DrawScreen(fullStatus);
             InputHandler.WaitForKey();

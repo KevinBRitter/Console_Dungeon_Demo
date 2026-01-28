@@ -143,7 +143,21 @@ namespace Console_Dungeon.Encounters
             _gameState.Player.Gold += result.TotalGold;
             _gameState.Player.Kills += result.TotalKills;
 
-            return result.GetFullMessage();
+            // Award experience based on kills and level
+            int xpPerKill = 10 + (_gameState.CurrentLevel.LevelNumber * 5); // Scales with dungeon level
+            int totalXP = result.TotalKills * xpPerKill;
+            _gameState.Player.GainExperience(totalXP);
+
+            // Add XP gain message
+            string xpMessage = MessageManager.GetMessage("experience.gained", ("xp", totalXP));
+
+            // If boss defeated, mark level complete
+            if (currentRoom.IsBossRoom)
+            {
+                _gameState.CurrentLevel.IsBossDefeated = true;
+            }
+
+            return result.GetFullMessage() + $"\n\n{xpMessage}";
         }
         private CombatEncounter GetBossEncounter(EncounterData encounters, int currentLevel, Random rng)
         {

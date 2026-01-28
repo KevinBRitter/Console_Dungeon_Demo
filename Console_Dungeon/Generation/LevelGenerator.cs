@@ -1,7 +1,5 @@
 ﻿using Console_Dungeon.Managers;
 using Console_Dungeon.Models;
-using System;
-using System.Collections.Generic;
 
 namespace Console_Dungeon.Generation
 {
@@ -30,13 +28,59 @@ namespace Console_Dungeon.Generation
             // Try to generate a connected path
             var path = GenerateConnectedPath(startX, startY, target);
 
+            // CRITICAL: Ensure starting position is in the path
+            if (!path.Contains((startX, startY)))
+            {
+                DebugLogger.Log($"WARNING: Start position ({startX},{startY}) not in generated path! Adding it.");
+                path.Add((startX, startY));
+            }
+
             // Convert path to room grid
-            return CreateRoomGrid(path);
+            return CreateRoomGrid(path, startX, startY);
+        }
+
+        private Room[,] CreateRoomGrid(HashSet<(int x, int y)> path, int startX, int startY)
+        {
+            var rooms = new Room[_width, _height];
+            var rng = new Random(_seed);
+
+            for (int x = 0; x < _width; x++)
+            {
+                for (int y = 0; y < _height; y++)
+                {
+                    if (path.Contains((x, y)))
+                    {
+                        // Walkable room
+                        string description;
+
+                        if (x == startX && y == startY)
+                        {
+                            description = "The entrance to the dungeon. Your journey begins here.";
+                        }
+                        else
+                        {
+                            description = RoomDescriptionManager.GetRandomStandardRoom(rng);
+                        }
+
+                        rooms[x, y] = new Room(description, hasEncounter: true, isBlocked: false);
+                    }
+                    else
+                    {
+                        // Blocked room
+                        string description = RoomDescriptionManager.GetRandomBlockedRoom(rng, x, y);
+                        rooms[x, y] = new Room(description, hasEncounter: false, isBlocked: true);
+                    }
+                }
+            }
+
+            return rooms;
         }
 
         private HashSet<(int x, int y)> GenerateConnectedPath(int startX, int startY, int targetCount)
         {
             const int maxAttempts = 100;
+
+            DebugLogger.Log($"Generating path: start=({startX},{startY}), target={targetCount} rooms");
 
             for (int attempt = 0; attempt < maxAttempts; attempt++)
             {
@@ -44,11 +88,21 @@ namespace Console_Dungeon.Generation
 
                 if (path != null && path.Count == targetCount)
                 {
+                    DebugLogger.Log($"Path generated successfully on attempt {attempt + 1}: {path.Count} rooms");
+
+                    // Verify starting position is in path
+                    if (!path.Contains((startX, startY)))
+                    {
+                        DebugLogger.Log($"ERROR: Start position not in path! Adding it.");
+                        path.Add((startX, startY));
+                    }
+
                     return path;
                 }
             }
 
             // Fallback: create simple path if generation fails
+            DebugLogger.Log($"Path generation failed after {maxAttempts} attempts, using fallback");
             return GenerateFallbackPath(startX, startY, targetCount);
         }
 
@@ -113,10 +167,12 @@ namespace Console_Dungeon.Generation
         private HashSet<(int x, int y)> GenerateFallbackPath(int startX, int startY, int targetCount)
         {
             var path = new HashSet<(int x, int y)>();
+
+            // Always start with the starting position
+            path.Add((startX, startY));
+
             int cx = startX;
             int cy = startY;
-
-            path.Add((cx, cy));
 
             var directions = new[] { (1, 0), (-1, 0), (0, 1), (0, -1) };
             int dirIdx = 0;
@@ -138,42 +194,23 @@ namespace Console_Dungeon.Generation
                 dirIdx = (dirIdx + 1) % directions.Length;
 
                 // Spiral outward if stuck
-                if (dirIdx == 0)
+                if (dirIdx == 0 && path.Count < targetCount)
                 {
                     spiralExpansion++;
                     cx = Math.Clamp(startX - spiralExpansion, 0, _width - 1);
                     cy = Math.Clamp(startY - spiralExpansion, 0, _height - 1);
+
+                    // Make sure we don't spiral forever
+                    if (spiralExpansion > Math.Max(_width, _height))
+                    {
+                        DebugLogger.Log($"Fallback spiral exceeded grid size, stopping at {path.Count} rooms");
+                        break;
+                    }
                 }
             }
 
+            DebugLogger.Log($"Fallback path generated: {path.Count} rooms");
             return path;
-        }
-
-        private Room[,] CreateRoomGrid(HashSet<(int x, int y)> path)
-        {
-            var rooms = new Room[_width, _height];
-            var rng = new Random(_seed);
-
-            for (int x = 0; x < _width; x++)
-            {
-                for (int y = 0; y < _height; y++)
-                {
-                    if (path.Contains((x, y)))
-                    {
-                        // Walkable room - use random description from JSON
-                        string description = RoomDescriptionManager.GetRandomStandardRoom(rng);
-                        rooms[x, y] = new Room(description, hasEncounter: true, isBlocked: false);
-                    }
-                    else
-                    {
-                        // Blocked room - use random blocked description from JSON
-                        string description = RoomDescriptionManager.GetRandomBlockedRoom(rng, x, y);
-                        rooms[x, y] = new Room(description, hasEncounter: false, isBlocked: true);
-                    }
-                }
-            }
-
-            return rooms;
         }
     }
 }

@@ -259,7 +259,22 @@ namespace Console_Dungeon.UI
                     }
                     else if (room.IsBlocked)
                     {
-                        sb.Append("[Z]");
+                        sb.Append("   "); //[Z]
+                    }
+                    else if (x == level.BossRoomX && y == level.BossRoomY)
+                    {
+                        if (level.IsBossDefeated)
+                        {
+                            sb.Append("[✓]"); // Defeated boss
+                        }
+                        else if (room.Visited)
+                        {
+                            sb.Append("[B]"); // Boss room discovered
+                        }
+                        else
+                        {
+                            sb.Append("[?]"); // Unknown
+                        }
                     }
                     else
                     {

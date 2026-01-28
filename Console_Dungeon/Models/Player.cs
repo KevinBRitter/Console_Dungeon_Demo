@@ -32,7 +32,19 @@ namespace Console_Dungeon.Models
         public int ExperienceToNextLevel { get; set; }
         public int Gold { get; set; }
         public int Kills { get; set; }
+        
+        // Track if player just leveled up (for showing level-up screen)
+        [NonSerialized]
+        private LevelUpInfo? _pendingLevelUp = null;
 
+        public bool HasPendingLevelUp => _pendingLevelUp != null;
+
+        public LevelUpInfo? GetAndClearLevelUp()
+        {
+            var levelUp = _pendingLevelUp;
+            _pendingLevelUp = null;
+            return levelUp;
+        }
         // Constructor with class
         public Player(string name, PlayerClass playerClass)
         {
@@ -122,6 +134,14 @@ namespace Console_Dungeon.Models
 
             if (classData != null)
             {
+                // Track old stats
+                int oldMaxHealth = MaxHealth;
+                int oldAttack = Attack;
+                int oldDefense = Defense;
+                int oldMaxStamina = MaxStamina;
+                int oldMaxMana = MaxMana;
+
+                // Increase level
                 Level++;
                 Experience -= ExperienceToNextLevel;
                 ExperienceToNextLevel = (int)(ExperienceToNextLevel * 1.5f);
@@ -137,7 +157,41 @@ namespace Console_Dungeon.Models
                 Health = MaxHealth;
                 Stamina = MaxStamina;
                 Mana = MaxMana;
+
+                // Store level-up info for display
+                _pendingLevelUp = new LevelUpInfo
+                {
+                    NewLevel = Level,
+                    HealthGain = MaxHealth - oldMaxHealth,
+                    AttackGain = Attack - oldAttack,
+                    DefenseGain = Defense - oldDefense,
+                    StaminaGain = MaxStamina - oldMaxStamina,
+                    ManaGain = MaxMana - oldMaxMana,
+                    NewMaxHealth = MaxHealth,
+                    NewAttack = Attack,
+                    NewDefense = Defense,
+                    NewMaxStamina = MaxStamina,
+                    NewMaxMana = MaxMana
+                };
             }
+        }
+        // Helper method to get XP progress as a percentage
+        public float GetXPProgress()
+        {
+            if (ExperienceToNextLevel == 0) return 1.0f;
+            return (float)Experience / ExperienceToNextLevel;
+        }
+
+        // Helper method to get XP progress bar
+        public string GetXPProgressBar(int barLength = 20)
+        {
+            float progress = GetXPProgress();
+            int filledLength = (int)(progress * barLength);
+
+            string filled = new string('=', filledLength);
+            string empty = new string(' ', barLength - filledLength);
+
+            return $"[{filled}>{empty}] {Experience}/{ExperienceToNextLevel} XP";
         }
     }        
 }

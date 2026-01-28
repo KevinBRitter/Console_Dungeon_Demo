@@ -38,6 +38,7 @@ namespace Console_Dungeon.Models
             CurrentLevel = new DungeonLevel(1, seed, gridW, gridH, roomsThisLevel);
 
             // Place player in the center of the grid (the generator starts here).
+            // TODO: This isn't working as expected the player is placed top left and disconnected from the level
             Player.PositionX = CurrentLevel.Width / 2;
             Player.PositionY = CurrentLevel.Height / 2;
 
@@ -67,6 +68,13 @@ namespace Console_Dungeon.Models
             {
                 startRoom.Visited = true;
                 CurrentLevel.RoomsExplored = 1;
+            }
+            // CRITICAL: Ensure starting room is NOT a boss room
+            if (startRoom.IsBossRoom)
+            {
+                DebugLogger.Log("ERROR: Starting room was marked as boss room! Fixing...");
+                startRoom.IsBossRoom = false;
+                startRoom.Description = "The entrance to the dungeon. Your journey begins here.";
             }
         }
 

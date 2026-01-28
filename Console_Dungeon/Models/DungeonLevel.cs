@@ -6,6 +6,7 @@ namespace Console_Dungeon.Models
     [Serializable]
     public class DungeonLevel
     {
+        // TODO: add that only one heal action per level for now, resting respawns enemies
         // Level metadata
         public int LevelNumber { get; set; }
         public int Seed { get; set; }
@@ -35,6 +36,10 @@ namespace Console_Dungeon.Models
 
             Width = Math.Max(1, width);
             Height = Math.Max(1, height);
+
+            // ENSURE MINIMUM ROOM COUNT - Need at least 2 rooms (start + boss)
+            int minRooms = 2;
+            int adjustedRoomCount = Math.Max(minRooms, roomCount);
 
             // Generate level layout
             GenerateLevel(roomCount);
@@ -98,29 +103,63 @@ namespace Console_Dungeon.Models
             // Count actual walkable rooms
             TotalRooms = CountWalkableRooms();
             RoomsExplored = 0;
+
+            DebugLogger.Log($"Level generated: {TotalRooms} walkable rooms");
+            DebugPrintLevel(); // Show the layout
         }
 
         private void PlaceBossRoom(int startX, int startY)
         {
-            // Find the furthest walkable room from start using Manhattan distance
+            // Use BFS to find the furthest walkable room by actual path distance
+            var distances = CalculatePathDistances(startX, startY);
+
             int maxDistance = 0;
             int bossX = startX;
             int bossY = startY;
 
-            for (int x = 0; x < Width; x++)
+            foreach (var kvp in distances)
             {
-                for (int y = 0; y < Height; y++)
+                var (x, y) = kvp.Key;
+                int distance = kvp.Value;
+
+                // Skip starting position
+                if (x == startX && y == startY)
                 {
-                    if (!Rooms[x, y].IsBlocked)
+                    continue;
+                }
+
+                if (distance > maxDistance)
+                {
+                    maxDistance = distance;
+                    bossX = x;
+                    bossY = y;
+                }
+            }
+
+            // Verify boss room is not at starting position
+            if (bossX == startX && bossY == startY)
+            {
+                DebugLogger.Log($"ERROR: Boss room would be at start position! Finding alternative...");
+
+                // Find ANY other walkable room
+                bool foundAlternative = false;
+                for (int x = 0; x < Width && !foundAlternative; x++)
+                {
+                    for (int y = 0; y < Height && !foundAlternative; y++)
                     {
-                        int distance = Math.Abs(x - startX) + Math.Abs(y - startY);
-                        if (distance > maxDistance)
+                        if (!Rooms[x, y].IsBlocked && (x != startX || y != startY))
                         {
-                            maxDistance = distance;
                             bossX = x;
                             bossY = y;
+                            foundAlternative = true;
+                            DebugLogger.Log($"Alternative boss room found at ({bossX},{bossY})");
                         }
                     }
+                }
+
+                if (!foundAlternative)
+                {
+                    DebugLogger.Log($"WARNING: Could not find alternative boss room! Only 1 walkable room exists!");
                 }
             }
 
@@ -139,7 +178,47 @@ namespace Console_Dungeon.Models
             DebugLogger.Log($"Boss room - HasEncounter: {Rooms[bossX, bossY].HasEncounter}");
             DebugLogger.Log($"Boss room - IsBlocked: {Rooms[bossX, bossY].IsBlocked}");
         }
+        // BFS to calculate actual path distances from start to all reachable rooms
+        private Dictionary<(int x, int y), int> CalculatePathDistances(int startX, int startY)
+        {
+            var distances = new Dictionary<(int x, int y), int>();
+            var queue = new Queue<(int x, int y, int dist)>();
+            var visited = new HashSet<(int x, int y)>();
 
+            queue.Enqueue((startX, startY, 0));
+            visited.Add((startX, startY));
+            distances[(startX, startY)] = 0;
+
+            while (queue.Count > 0)
+            {
+                var (x, y, dist) = queue.Dequeue();
+
+                // Check all 4 orthogonal neighbors
+                var neighbors = new[]
+                {
+                    (x + 1, y), (x - 1, y),
+                    (x, y + 1), (x, y - 1)
+                };
+
+                foreach (var (nx, ny) in neighbors)
+                {
+                    // Check bounds
+                    if (nx < 0 || nx >= Width || ny < 0 || ny >= Height)
+                        continue;
+
+                    // Check if walkable and not visited
+                    if (Rooms[nx, ny].IsBlocked || visited.Contains((nx, ny)))
+                        continue;
+
+                    visited.Add((nx, ny));
+                    distances[(nx, ny)] = dist + 1;
+                    queue.Enqueue((nx, ny, dist + 1));
+                }
+            }
+
+            DebugLogger.Log($"Path distance calculation: {distances.Count} reachable rooms from start");
+            return distances;
+        }
         private int CountWalkableRooms()
         {
             int count = 0;
@@ -154,6 +233,26 @@ namespace Console_Dungeon.Models
                 }
             }
             return count;
+        }
+        public void DebugPrintLevel()
+        {
+            DebugLogger.Log("=== Level Layout ===");
+            for (int y = 0; y < Height; y++)
+            {
+                string row = "";
+                for (int x = 0; x < Width; x++)
+                {
+                    if (x == Width / 2 && y == Height / 2)
+                        row += "S"; // Start
+                    else if (x == BossRoomX && y == BossRoomY)
+                        row += "B"; // Boss
+                    else if (Rooms[x, y].IsBlocked)
+                        row += "#"; // Wall
+                    else
+                        row += "."; // Room
+                }
+                DebugLogger.Log(row);
+            }
         }
     }
 }
