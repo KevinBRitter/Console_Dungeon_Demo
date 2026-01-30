@@ -1,4 +1,5 @@
-﻿using Console_Dungeon.Managers;
+﻿using Console_Dungeon.Enums;
+using Console_Dungeon.Managers;
 using Console_Dungeon.Models;
 
 namespace Console_Dungeon.Generation
@@ -56,19 +57,44 @@ namespace Console_Dungeon.Generation
                         if (x == startX && y == startY)
                         {
                             description = "The entrance to the dungeon. Your journey begins here.";
+                            rooms[x, y] = new Room(description, hasEncounter: false, isBlocked: false);
+                            // Start room: no encounter
+                            rooms[x, y].Encounter = EncounterKind.None;
+                            rooms[x, y].HasEncounter = false;
                         }
                         else
                         {
                             description = RoomDescriptionManager.GetRandomStandardRoom(rng);
-                        }
+                            // Assign encounter kind deterministically based on RNG and the seed.
+                            // Maintain original probabilities:
+                            // 1-3 => Treasure (30%), 4-8 => Combat (50%), 9-10 => Empty (20%)
+                            int roll = rng.Next(1, 11);
+                            EncounterKind kind;
+                            if (roll <= 3)
+                            {
+                                kind = EncounterKind.Treasure;
+                            }
+                            else if (roll <= 8)
+                            {
+                                kind = EncounterKind.Combat;
+                            }
+                            else
+                            {
+                                kind = EncounterKind.None;
+                            }
 
-                        rooms[x, y] = new Room(description, hasEncounter: true, isBlocked: false);
+                            rooms[x, y] = new Room(description, hasEncounter: kind != EncounterKind.None, isBlocked: false);
+                            rooms[x, y].Encounter = kind;
+                            rooms[x, y].HasEncounter = (kind != EncounterKind.None);
+                        }
                     }
                     else
                     {
                         // Blocked room
                         string description = RoomDescriptionManager.GetRandomBlockedRoom(rng, x, y);
                         rooms[x, y] = new Room(description, hasEncounter: false, isBlocked: true);
+                        rooms[x, y].Encounter = EncounterKind.None;
+                        rooms[x, y].HasEncounter = false;
                     }
                 }
             }

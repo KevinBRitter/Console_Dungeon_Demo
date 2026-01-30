@@ -1,4 +1,5 @@
-﻿using Console_Dungeon.Input;
+﻿using Console_Dungeon.Enums;
+using Console_Dungeon.Input;
 using Console_Dungeon.Managers;
 using Console_Dungeon.Models;
 using Console_Dungeon.UI;
@@ -23,10 +24,9 @@ namespace Console_Dungeon.Encounters
 
             DebugLogger.Log($"TriggerEncounter called at ({_gameState.Player.PositionX}, {_gameState.Player.PositionY})");
             DebugLogger.Log($"Room.IsBossRoom: {currentRoom.IsBossRoom}");
-            DebugLogger.Log($"Room.HasEncounter: {currentRoom.HasEncounter}");
+            DebugLogger.Log($"Room.Encounter: {currentRoom.Encounter}");
             DebugLogger.Log($"Room.EncounterTriggered: {currentRoom.EncounterTriggered}");
             DebugLogger.Log($"Room.CanTriggerEncounter: {currentRoom.CanTriggerEncounter}");
-
 
             if (!currentRoom.CanTriggerEncounter)
             {
@@ -34,29 +34,31 @@ namespace Console_Dungeon.Encounters
                 return;
             }
 
+            // Mark triggered so repeated searches do not re-trigger
             currentRoom.EncounterTriggered = true;
 
-            Random rng = new Random(_gameState.Seed + _gameState.TurnCount);
-            int encounterType = rng.Next(1, 11);
-
-            DebugLogger.Log($"Encounter type roll: {encounterType} (1-3=treasure, 4-8=combat, 9-10=empty)");
+            // If this is a boss room, ensure combat regardless of assigned kind
+            var effectiveKind = currentRoom.IsBossRoom ? EncounterKind.Combat : currentRoom.Encounter;
 
             string encounterText;
 
-            if (encounterType <= 3)
+            switch (effectiveKind)
             {
-                DebugLogger.Log("Triggering treasure encounter");
-                encounterText = HandleTreasure(rng);
-            }
-            else if (encounterType <= 8)
-            {
-                DebugLogger.Log("Triggering combat encounter");
-                encounterText = HandleCombat(rng);
-            }
-            else
-            {
-                DebugLogger.Log("Triggering empty room encounter");
-                encounterText = HandleEmptyRoom(rng);
+                case EncounterKind.Treasure:
+                    DebugLogger.Log("Triggering treasure encounter (pre-determined)");
+                    encounterText = HandleTreasure(new Random(_gameState.Seed + _gameState.TurnCount));
+                    break;
+
+                case EncounterKind.Combat:
+                    DebugLogger.Log("Triggering combat encounter (pre-determined)");
+                    encounterText = HandleCombat(new Random(_gameState.Seed + _gameState.TurnCount));
+                    break;
+
+                case EncounterKind.None:
+                default:
+                    DebugLogger.Log("Triggering empty room encounter (pre-determined)");
+                    encounterText = HandleEmptyRoom(new Random(_gameState.Seed + _gameState.TurnCount));
+                    break;
             }
 
             ScreenRenderer.DrawScreen(encounterText + "\n\nPress any key to continue...");
@@ -115,7 +117,7 @@ namespace Console_Dungeon.Encounters
             if (currentRoom.IsBossRoom)
             {
                 selectedEncounter = GetBossEncounter(encounters, currentLevel, rng);
-                DebugLogger.Log($"HandleCombat - Selected Regular Encounter: {selectedEncounter.Id}");
+                DebugLogger.Log($"HandleCombat - Selected Boss Encounter: {selectedEncounter.Id}");
             }
             else
             {
@@ -159,6 +161,7 @@ namespace Console_Dungeon.Encounters
 
             return result.GetFullMessage() + $"\n\n{xpMessage}";
         }
+
         private CombatEncounter GetBossEncounter(EncounterData encounters, int currentLevel, Random rng)
         {
             // Get all boss encounters valid for this level

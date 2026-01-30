@@ -2,13 +2,15 @@
 using Console_Dungeon.Enums;
 using Console_Dungeon.Menus;
 using Console_Dungeon.Models;
+using Console_Dungeon.UI;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Ensure console is at a usable size before starting UI
-        EnsureConsoleSize(minWidth: 80, minHeight: 32);
+        // Ensure console is at a usable size before starting UI.
+        // EnsureConsoleSize will size the host window larger than the renderer's fixed box.
+        EnsureConsoleSize();
 
         GameState? currentGameState = null;
         IMenu currentMenu = new MainMenu();
@@ -77,8 +79,18 @@ class Program
         }
     }
 
-    private static void EnsureConsoleSize(int minWidth = 80, int minHeight = 32)
+    // Ensure console window is larger than the fixed-size game box used by ScreenRenderer.
+    // The renderer now draws a fixed-size box (ScreenRenderer.BoxWidth/BoxHeight).  Make the
+    // host console at least a few columns/rows larger so the asterisk box never fills the window.
+    private static void EnsureConsoleSize()
     {
+        // Keep small safety margins so the window is noticeably larger than the game box.
+        const int horizontalMargin = 6;
+        const int verticalMargin = 4;
+
+        int minWidth = ScreenRenderer.BoxWidth + horizontalMargin;
+        int minHeight = ScreenRenderer.BoxHeight + verticalMargin;
+
         try
         {
             // On Windows, buffer must be >= desired window size. Increase buffer first,
@@ -107,7 +119,7 @@ class Program
         }
         catch (PlatformNotSupportedException)
         {
-            // Console sizing not supported on this platform — renderer will adapt
+            // Console sizing not supported on this platform — renderer will adapt (but may be clipped)
         }
         catch (IOException)
         {

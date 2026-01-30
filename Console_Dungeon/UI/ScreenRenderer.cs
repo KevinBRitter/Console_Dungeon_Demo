@@ -12,9 +12,14 @@ namespace Console_Dungeon.UI
         // Default remains the real console output.
         public static TextWriter Output = Console.Out;
 
+        // Fixed game box size (the asterisk box). The renderer will always draw this size.
+        // Program.EnsureConsoleSize must make the host window larger than this box.
+        public const int BoxWidth = 80;  // width of the outer '*' box
+        public const int BoxHeight = 30; // height of the outer '*' box
+
         // Defaults used when Console.WindowWidth/Height are unavailable or can't be relied on.
-        private const int DefaultScreenWidth = 80;  // target console width
-        private const int DefaultScreenHeight = 30; // target console height
+        private const int DefaultScreenWidth = BoxWidth;  // target console width (kept for compatibility)
+        private const int DefaultScreenHeight = BoxHeight; // target console height
 
         // Minimum sensible dimensions to avoid broken layout when console reports tiny sizes.
         private const int MinConsoleWidth = 40;
@@ -30,41 +35,10 @@ namespace Console_Dungeon.UI
         private const string DefaultHeader = "Console Dungeon";
         private const string DefaultFooter = "a demo project by Kevin Ritter";
 
-        // Compute effective screen size: prefer actual console size (if available),
-        // otherwise fall back to defaults. Do NOT inflate to the default when the
-        // actual console is smaller — use the host-provided size (clamped to a minimum).
-        private static int ScreenWidth => GetEffectiveConsoleWidth();
-        private static int ScreenHeight => GetEffectiveConsoleHeight();
-
-        private static int GetEffectiveConsoleWidth()
-        {
-            try
-            {
-                // Prefer the actual host window width, but clamp to a minimum so layout code remains stable.
-                int w = Console.WindowWidth;
-                return Math.Max(MinConsoleWidth, w);
-            }
-            catch
-            {
-                // If querying Console.WindowWidth fails (no console / unsupported), fall back to default target size.
-                return DefaultScreenWidth;
-            }
-        }
-
-        private static int GetEffectiveConsoleHeight()
-        {
-            try
-            {
-                // Prefer the actual host window height, but clamp to a minimum so layout code remains stable.
-                int h = Console.WindowHeight;
-                return Math.Max(MinConsoleHeight, h);
-            }
-            catch
-            {
-                // If querying Console.WindowHeight fails (no console / unsupported), fall back to default target size.
-                return DefaultScreenHeight;
-            }
-        }
+        // The renderer uses a fixed-size box for the game area so the box never changes size.
+        // ScreenWidth/Height reflect that fixed box.
+        private static int ScreenWidth => BoxWidth;
+        private static int ScreenHeight => BoxHeight;
 
         // Backwards-compatible single-string API
         public static void DrawScreen(string text)
