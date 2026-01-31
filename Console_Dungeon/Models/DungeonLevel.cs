@@ -18,6 +18,10 @@ namespace Console_Dungeon.Models
         public int Height { get; set; }
         public Room[,] Rooms { get; set; }
 
+        // Start position for this level (determined during generation)
+        public int StartX { get; private set; }
+        public int StartY { get; private set; }
+
         // Progress tracking
         public int RoomsExplored { get; set; }
         public int TotalRooms { get; set; }
@@ -34,6 +38,7 @@ namespace Console_Dungeon.Models
             IsExplored = false;
             IsBossDefeated = false;
 
+            // Default values (may be overridden in GenerateLevel to produce 5x10 oriented grids)
             Width = Math.Max(1, width);
             Height = Math.Max(1, height);
 
@@ -41,8 +46,8 @@ namespace Console_Dungeon.Models
             int minRooms = 2;
             int adjustedRoomCount = Math.Max(minRooms, roomCount);
 
-            // Generate level layout
-            GenerateLevel(roomCount);
+            // Generate level layout (this will configure Width/Height/start position and Rooms)
+            GenerateLevel(adjustedRoomCount);
         }
 
         // Parameterless constructor for deserialization
@@ -64,6 +69,8 @@ namespace Console_Dungeon.Models
             TotalRooms = Width * Height;
             BossRoomX = Width - 1;
             BossRoomY = Height - 1;
+            StartX = Width / 2;
+            StartY = Height / 2;
         }
 
         // Helper methods
@@ -85,20 +92,64 @@ namespace Console_Dungeon.Models
 
         private void GenerateLevel(int roomCount)
         {
-            // Ensure room count doesn't exceed grid capacity
-            int maxPossible = Width * Height;
-            int targetRooms = Math.Min(roomCount, maxPossible);
+            // Determine grid orientation and size: use a 5x10 area (either 10x5 or 5x10).
+            // Keep deterministic per level by using the level seed.
+            var rng = new Random(Seed + LevelNumber);
 
-            // Starting position (center of grid)
-            int startX = Width / 2;
-            int startY = Height / 2;
+            // Decide orientation: 0 => horizontal (width=10, height=5), 1 => vertical (width=5, height=10)
+            bool horizontal = rng.Next(0, 2) == 0;
+            Width = horizontal ? 10 : 5;
+            Height = horizontal ? 5 : 10;
 
-            // Generate connected path
+            // Determine target room count based on level ranges:
+            // Levels 1-5: 6-10
+            // Levels 6-10: 11-15
+            // Levels 11+: 16-20
+            int minRooms, maxRooms;
+            if (LevelNumber <= 5)
+            {
+                minRooms = 6;
+                maxRooms = 10;
+            }
+            else if (LevelNumber <= 10)
+            {
+                minRooms = 11;
+                maxRooms = 15;
+            }
+            else
+            {
+                minRooms = 16;
+                maxRooms = 20;
+            }
+
+            int targetRooms = Math.Min(roomCount, Width * Height);
+            // If roomCount passed in is a placeholder, pick a value in desired range deterministically.
+            if (roomCount <= 1 || roomCount > Width * Height)
+            {
+                targetRooms = rng.Next(minRooms, Math.Min(maxRooms, Width * Height) + 1);
+            }
+            else
+            {
+                // clamp to the desired band if caller provided a specific number
+                targetRooms = Math.Clamp(roomCount, minRooms, Math.Min(maxRooms, Width * Height));
+            }
+
+            // Starting position: choose somewhere within the central 5x5 region.
+            // Compute offset for central 5x5 block (works for 10x5 or 5x10).
+            int offsetX = Math.Max(0, (Width - 5) / 2);
+            int offsetY = Math.Max(0, (Height - 5) / 2);
+
+            StartX = offsetX + rng.Next(0, Math.Min(5, Width - offsetX));
+            StartY = offsetY + rng.Next(0, Math.Min(5, Height - offsetY));
+
+            DebugLogger.Log($"Generating level {LevelNumber} size {Width}x{Height} orientation={(horizontal ? "H" : "V")} targetRooms={targetRooms} start=({StartX},{StartY})");
+
+            // Generate connected path from start
             var generator = new LevelGenerator(Seed, Width, Height);
-            Rooms = generator.Generate(targetRooms, startX, startY);
+            Rooms = generator.Generate(targetRooms, StartX, StartY);
 
             // Place boss room at the furthest walkable room from start
-            PlaceBossRoom(startX, startY);
+            PlaceBossRoom(StartX, StartY);
 
             // Count actual walkable rooms
             TotalRooms = CountWalkableRooms();
@@ -242,7 +293,7 @@ namespace Console_Dungeon.Models
                 string row = "";
                 for (int x = 0; x < Width; x++)
                 {
-                    if (x == Width / 2 && y == Height / 2)
+                    if (x == StartX && y == StartY)
                         row += "S"; // Start
                     else if (x == BossRoomX && y == BossRoomY)
                         row += "B"; // Boss

@@ -181,6 +181,7 @@ These are intentionally small but impactful and fit well before â€œfull systemsâ
 - Critical hits (10% chance for double damage?)
 - Loot drops (enemies sometimes drop items, not just gold)
 - Rare encounters (mimics, treasure guardians, etc.)
+- Rare rooms (campfire for increased healing, shrine for divine item identification/ repair)
 - Environmental hazards (traps, poison gas, etc.)
 - Multiple encounter files - TreasureEncounters.json, Enemies.json, etc.
 - Localization - Encounters_en.json, Encounters_es.json
@@ -195,8 +196,8 @@ These are intentionally small but impactful and fit well before â€œfull systemsâ
 # TODO Summarize / organize this and fit into previous enhancement ideas sections
 ### Phase 3.5 â€” Character Creation Polish (Quick Wins)
 - [ ] Starting backgrounds (JSON-based)
-- [ ] XP progress bar in status screen
-- [ ] Level-up celebration screen
+- [x] XP progress bar in status screen
+- [x] Level-up celebration screen
 - [ ] Quick start / random character option
 - [ ] Character creation tutorial tips
 

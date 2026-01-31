@@ -1,9 +1,7 @@
-﻿using Console_Dungeon.Enums;
-using Console_Dungeon.Input;
+﻿using Console_Dungeon.Input;
 using Console_Dungeon.Managers;
 using Console_Dungeon.Models;
 using Console_Dungeon.UI;
-using System.Diagnostics;
 
 namespace Console_Dungeon.Encounters
 {
@@ -34,35 +32,243 @@ namespace Console_Dungeon.Encounters
                 return;
             }
 
-            // Mark triggered so repeated searches do not re-trigger
+            // Mark triggered so repeated searches do not re-trigger unless player flees
             currentRoom.EncounterTriggered = true;
 
-            // If this is a boss room, ensure combat regardless of assigned kind
-            var effectiveKind = currentRoom.IsBossRoom ? EncounterKind.Combat : currentRoom.Encounter;
+            // If this is a boss room, force combat regardless of assigned kind
+            var effectiveKind = currentRoom.IsBossRoom ? Enums.EncounterKind.Combat : currentRoom.Encounter;
 
             string encounterText;
 
             switch (effectiveKind)
             {
-                case EncounterKind.Treasure:
+                case Enums.EncounterKind.Treasure:
                     DebugLogger.Log("Triggering treasure encounter (pre-determined)");
                     encounterText = HandleTreasure(new Random(_gameState.Seed + _gameState.TurnCount));
+                    ScreenRenderer.DrawScreen(encounterText + "\n\nPress any key to continue...");
+                    InputHandler.WaitForKey();
                     break;
 
-                case EncounterKind.Combat:
+                case Enums.EncounterKind.Combat:
                     DebugLogger.Log("Triggering combat encounter (pre-determined)");
-                    encounterText = HandleCombat(new Random(_gameState.Seed + _gameState.TurnCount));
+
+                    var encounters = EncounterManager.GetEncounters();
+                    int currentLevel = _gameState.CurrentLevel.LevelNumber;
+
+                    CombatEncounter selectedEncounter;
+                    if (currentRoom.IsBossRoom)
+                    {
+                        selectedEncounter = GetBossEncounter(encounters, currentLevel, new Random(_gameState.Seed + _gameState.TurnCount));
+                    }
+                    else
+                    {
+                        var validEncounters = encounters.CombatEncounters
+                            .Where(e => !e.IsBoss && e.MinLevel <= currentLevel && e.MaxLevel >= currentLevel)
+                            .ToList();
+
+                        if (validEncounters.Count == 0)
+                        {
+                            encounterText = "An unknown creature attacks, but flees before combat begins!";
+                            ScreenRenderer.DrawScreen(encounterText + "\n\nPress any key to continue...");
+                            InputHandler.WaitForKey();
+                            return;
+                        }
+
+                        selectedEncounter = SelectWeightedEncounter(validEncounters, new Random(_gameState.Seed + _gameState.TurnCount));
+                    }
+
+                    // Interactive combat loop: player chooses Attack or Flee each turn
+                    var encRng = new Random(_gameState.Seed + _gameState.TurnCount);
+                    var encounterData = EncounterManager.GetEncounters();
+
+                    // Build enemy instances list (mutable tuples)
+                    var enemyInstances = new List<(string Id, string Name, int DamageMin, int DamageMax, int GoldMin, int GoldMax, int Health)>();
+                    foreach (var group in selectedEncounter.Enemies)
+                    {
+                        if (!encounterData.EnemyTypes.TryGetValue(group.Type, out var template))
+                            continue;
+
+                        for (int i = 0; i < Math.Max(1, group.Count); i++)
+                        {
+                            int hp = Math.Max(1, template.DamageMax * 2 + 5);
+                            enemyInstances.Add((group.Type, template.Name, template.DamageMin, template.DamageMax, template.GoldMin, template.GoldMax, hp));
+                        }
+                    }
+
+                    var combatResult = new CombatResult();
+                    combatResult.EncounterMessage = selectedEncounter.EncounterMessages?.Count > 0
+                        ? selectedEncounter.EncounterMessages[encRng.Next(selectedEncounter.EncounterMessages.Count)]
+                        : "Combat begins!";
+
+                    bool fled = false;
+
+                    while (_gameState.Player.IsAlive && enemyInstances.Any(e => e.Health > 0))
+                    {
+                        // Show status
+                        var statusSb = new System.Text.StringBuilder();
+                        statusSb.AppendLine(combatResult.EncounterMessage);
+                        statusSb.AppendLine();
+                        statusSb.AppendLine($"Player HP: {_gameState.Player.Health}/{_gameState.Player.MaxHealth}");
+                        statusSb.AppendLine();
+                        statusSb.AppendLine("Enemies:");
+                        for (int i = 0; i < enemyInstances.Count; i++)
+                        {
+                            var e = enemyInstances[i];
+                            string life = e.Health > 0 ? $"{e.Health} HP" : "Dead";
+                            statusSb.AppendLine($" {i + 1}. {e.Name} - {life}");
+                        }
+                        statusSb.AppendLine();
+                        statusSb.AppendLine("Choose an action:");
+                        statusSb.AppendLine("1) Attack");
+                        statusSb.AppendLine("2) Flee");
+
+                        ScreenRenderer.DrawScreen(statusSb.ToString());
+                        string input = InputHandler.GetMenuChoice().Trim();
+
+                        if (input == "2")
+                        {
+                            // Flee: room returns to unexplored and encounter is unset so it can be retriggered.
+                            fled = true;
+                            currentRoom.EncounterTriggered = false;
+                            if (currentRoom.Visited)
+                            {
+                                currentRoom.Visited = false;
+                                if (_gameState.CurrentLevel.RoomsExplored > 0)
+                                    _gameState.CurrentLevel.RoomsExplored--;
+                            }
+
+                            ScreenRenderer.DrawScreen("You flee from the encounter!\n\nPress any key to continue...");
+                            InputHandler.WaitForKey();
+                            break;
+                        }
+
+                        // Default: Attack
+                        var targetIdx = enemyInstances.FindIndex(e => e.Health > 0);
+                        if (targetIdx < 0)
+                            break;
+
+                        var target = enemyInstances[targetIdx];
+
+                        // Player damage roll
+                        int minPlayerDamage = Math.Max(1, _gameState.Player.Attack / 2);
+                        int maxPlayerDamage = Math.Max(minPlayerDamage, _gameState.Player.Attack);
+                        int playerDamage = encRng.Next(minPlayerDamage, maxPlayerDamage + 1);
+
+                        // Apply to target
+                        target.Health = Math.Max(0, target.Health - playerDamage);
+                        enemyInstances[targetIdx] = target;
+
+                        var turnSb = new System.Text.StringBuilder();
+                        turnSb.AppendLine($"You attack the {target.Name} for {playerDamage} damage.");
+                        combatResult.DamageBreakdown.Add($"Player -> {target.Name}: {playerDamage} damage");
+
+                        if (target.Health == 0)
+                        {
+                            combatResult.TotalKills++;
+                            int goldFound = encRng.Next(target.GoldMin, target.GoldMax + 1);
+                            combatResult.TotalGold += goldFound;
+                            turnSb.AppendLine($"You slay the {target.Name} and find {goldFound} gold.");
+                        }
+
+                        // Enemies retaliate (each alive enemy)
+                        foreach (var enemy in enemyInstances.Where(e => e.Health > 0).ToList())
+                        {
+                            int rawEnemyDamage = encRng.Next(Math.Max(1, enemy.DamageMin), Math.Max(enemy.DamageMin, enemy.DamageMax) + 1);
+
+                            // Compute actual damage after defense
+                            int actualDamage = Math.Max(1, rawEnemyDamage - _gameState.Player.Defense);
+
+                            // Apply damage using Player.TakeDamage (pass raw to keep logic consistent)
+                            _gameState.Player.TakeDamage(rawEnemyDamage);
+
+                            combatResult.TotalDamage += actualDamage;
+                            combatResult.DamageBreakdown.Add($"{enemy.Name}: {actualDamage} damage");
+
+                            turnSb.AppendLine($"{enemy.Name} hits you for {actualDamage} damage.");
+
+                            if (!_gameState.Player.IsAlive)
+                            {
+                                turnSb.AppendLine("You have been defeated...");
+                                break;
+                            }
+                        }
+
+                        // Count this as a player turn
+                        _gameState.TurnCount++;
+
+                        // Show turn results
+                        ScreenRenderer.DrawScreen(turnSb.ToString() + "\n\nPress any key to continue...");
+                        InputHandler.WaitForKey();
+                    }
+
+                    if (fled)
+                    {
+                        // Player fled: do not award XP or loot, leave room untriggered/unvisited for re-entry
+                        return;
+                    }
+
+                    if (_gameState.Player.IsAlive)
+                    {
+                        // Victory: finalize messages and award gold/kills
+                        if (selectedEncounter.VictoryMessages?.Count > 0)
+                        {
+                            var victoryTemplate = selectedEncounter.VictoryMessages[encRng.Next(selectedEncounter.VictoryMessages.Count)];
+                            combatResult.VictoryMessage = EncounterManager.FormatMessage(victoryTemplate, ("totalDamage", combatResult.TotalDamage));
+                        }
+                        else
+                        {
+                            combatResult.VictoryMessage = $"You survived the encounter taking {combatResult.TotalDamage} damage.";
+                        }
+
+                        if (selectedEncounter.LootMessages?.Count > 0)
+                        {
+                            var lootTemplate = selectedEncounter.LootMessages[encRng.Next(selectedEncounter.LootMessages.Count)];
+                            combatResult.LootMessage = EncounterManager.FormatMessage(lootTemplate, ("totalGold", combatResult.TotalGold));
+                        }
+                        else
+                        {
+                            combatResult.LootMessage = $"You gather {combatResult.TotalGold} gold.";
+                        }
+
+                        // Apply gold and kills to player
+                        _gameState.Player.Gold += combatResult.TotalGold;
+                        _gameState.Player.Kills += combatResult.TotalKills;
+
+                        // Award experience based on kills and level
+                        int xpPerKill = 10 + (_gameState.CurrentLevel.LevelNumber * 5);
+                        int totalXP = combatResult.TotalKills * xpPerKill;
+                        _gameState.Player.GainExperience(totalXP);
+
+                        // If boss defeated, mark level complete
+                        if (currentRoom.IsBossRoom)
+                        {
+                            _gameState.CurrentLevel.IsBossDefeated = true;
+                        }
+
+                        string xpMessage = MessageManager.GetMessage("experience.gained", ("xp", totalXP));
+                        encounterText = combatResult.GetFullMessage() + $"\n\n{xpMessage}";
+
+                        ScreenRenderer.DrawScreen(encounterText + "\n\nPress any key to continue...");
+                        InputHandler.WaitForKey();
+                    }
+                    else
+                    {
+                        // Defeat
+                        encounterText = "You were defeated in combat...";
+                        ScreenRenderer.DrawScreen(encounterText + "\n\nPress any key to continue...");
+                        InputHandler.WaitForKey();
+                    }
+
                     break;
 
-                case EncounterKind.None:
+                case Enums.EncounterKind.None:
                 default:
                     DebugLogger.Log("Triggering empty room encounter (pre-determined)");
                     encounterText = HandleEmptyRoom(new Random(_gameState.Seed + _gameState.TurnCount));
+                    ScreenRenderer.DrawScreen(encounterText + "\n\nPress any key to continue...");
+                    InputHandler.WaitForKey();
                     break;
             }
-
-            ScreenRenderer.DrawScreen(encounterText + "\n\nPress any key to continue...");
-            InputHandler.WaitForKey();
         }
 
         private void ShowAlreadySearchedMessage()
@@ -96,70 +302,6 @@ namespace Console_Dungeon.Encounters
 
             string template = encounters.TreasureEncounters[rng.Next(encounters.TreasureEncounters.Count)];
             return EncounterManager.FormatMessage(template, ("gold", goldAmount));
-        }
-
-        private string HandleCombat(Random rng)
-        {
-            var encounters = EncounterManager.GetEncounters();
-            int currentLevel = _gameState.CurrentLevel.LevelNumber;
-
-            DebugLogger.Log($"HandleCombat - Current Level: {currentLevel}");
-            DebugLogger.Log($"HandleCombat - Total Combat Encounters: {encounters.CombatEncounters.Count}");
-
-            var currentRoom = _gameState.CurrentLevel.GetRoom(
-                _gameState.Player.PositionX,
-                _gameState.Player.PositionY);
-
-            DebugLogger.Log($"HandleCombat - Is Boss Room: {currentRoom.IsBossRoom}");
-
-            CombatEncounter selectedEncounter;
-
-            if (currentRoom.IsBossRoom)
-            {
-                selectedEncounter = GetBossEncounter(encounters, currentLevel, rng);
-                DebugLogger.Log($"HandleCombat - Selected Boss Encounter: {selectedEncounter.Id}");
-            }
-            else
-            {
-                var validEncounters = encounters.CombatEncounters
-                    .Where(e => !e.IsBoss && e.MinLevel <= currentLevel && e.MaxLevel >= currentLevel)
-                    .ToList();
-
-                Debug.WriteLine($"[DEBUG] Valid Regular Encounters: {validEncounters.Count}");
-
-                if (validEncounters.Count == 0)
-                {
-                    Debug.WriteLine("[DEBUG] No valid encounters found!");
-                    return "An unknown creature attacks, but flees before combat begins!";
-                }
-
-                selectedEncounter = SelectWeightedEncounter(validEncounters, rng);
-                Debug.WriteLine($"[DEBUG] Selected Regular Encounter: {selectedEncounter.Id}");
-            }
-
-            // Resolve combat
-            var result = ResolveCombat(selectedEncounter, rng);
-
-            // Apply effects to player
-            _gameState.Player.TakeDamage(result.TotalDamage);
-            _gameState.Player.Gold += result.TotalGold;
-            _gameState.Player.Kills += result.TotalKills;
-
-            // Award experience based on kills and level
-            int xpPerKill = 10 + (_gameState.CurrentLevel.LevelNumber * 5); // Scales with dungeon level
-            int totalXP = result.TotalKills * xpPerKill;
-            _gameState.Player.GainExperience(totalXP);
-
-            // Add XP gain message
-            string xpMessage = MessageManager.GetMessage("experience.gained", ("xp", totalXP));
-
-            // If boss defeated, mark level complete
-            if (currentRoom.IsBossRoom)
-            {
-                _gameState.CurrentLevel.IsBossDefeated = true;
-            }
-
-            return result.GetFullMessage() + $"\n\n{xpMessage}";
         }
 
         private CombatEncounter GetBossEncounter(EncounterData encounters, int currentLevel, Random rng)
@@ -206,48 +348,6 @@ namespace Console_Dungeon.Encounters
             }
 
             return encounters[0]; // Fallback
-        }
-
-        private CombatResult ResolveCombat(CombatEncounter encounter, Random rng)
-        {
-            var encounters = EncounterManager.GetEncounters();
-            var result = new CombatResult();
-
-            // Calculate damage and gold from each enemy
-            foreach (var enemyGroup in encounter.Enemies)
-            {
-                if (!encounters.EnemyTypes.ContainsKey(enemyGroup.Type))
-                {
-                    continue;
-                }
-
-                var enemyType = encounters.EnemyTypes[enemyGroup.Type];
-
-                for (int i = 0; i < enemyGroup.Count; i++)
-                {
-                    int damage = rng.Next(enemyType.DamageMin, enemyType.DamageMax);
-                    int gold = rng.Next(enemyType.GoldMin, enemyType.GoldMax);
-
-                    result.TotalDamage += damage;
-                    result.TotalGold += gold;
-                    result.TotalKills++;
-
-                    result.DamageBreakdown.Add($"{enemyType.Name}: {damage} damage");
-                }
-            }
-
-            // Select random messages
-            result.EncounterMessage = encounter.EncounterMessages[rng.Next(encounter.EncounterMessages.Count)];
-
-            string victoryTemplate = encounter.VictoryMessages[rng.Next(encounter.VictoryMessages.Count)];
-            result.VictoryMessage = EncounterManager.FormatMessage(victoryTemplate,
-                ("totalDamage", result.TotalDamage));
-
-            string lootTemplate = encounter.LootMessages[rng.Next(encounter.LootMessages.Count)];
-            result.LootMessage = EncounterManager.FormatMessage(lootTemplate,
-                ("totalGold", result.TotalGold));
-
-            return result;
         }
 
         private string HandleEmptyRoom(Random rng)

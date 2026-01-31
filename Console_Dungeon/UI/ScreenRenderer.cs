@@ -4,8 +4,6 @@ using Console_Dungeon.Models;
 
 namespace Console_Dungeon.UI
 {
-    // TODO: fix this sizing issue when console is resized during gameplay, each action
-    // causes the screen to redraw with different dimensions, leading to inconsistent layout.
     public static class ScreenRenderer
     {
         // Allow tests or other callers to capture output by swapping this writer.
@@ -264,6 +262,8 @@ namespace Console_Dungeon.UI
 
         // Renders a small ASCII map of the dungeon grid.
         // [X] = player's current room, [E] = explored (visited), [ ] = unexplored walkable room, [Z] = wall/blocked
+        // Boss room logic: don't reveal boss on map until player is within Manhattan distance 1 (adjacent or diagonal not counted).
+        // When boss is defeated show [✓] regardless.
         public static string RenderMap(DungeonLevel level, Models.Player player)
         {
             var sb = new StringBuilder();
@@ -284,17 +284,26 @@ namespace Console_Dungeon.UI
                     }
                     else if (x == level.BossRoomX && y == level.BossRoomY)
                     {
+                        // Boss visibility rules:
+                        // - If boss already defeated, show checkmark.
+                        // - Otherwise, reveal the boss marker only when player is within Manhattan distance 1 (adjacent).
+                        int dx = Math.Abs(player.PositionX - x);
+                        int dy = Math.Abs(player.PositionY - y);
+                        int manhattan = dx + dy;
+
                         if (level.IsBossDefeated)
                         {
-                            sb.Append("[✓]"); // Defeated boss
+                            sb.Append("[✓]");
                         }
-                        else if (room.Visited)
+                        else if (manhattan <= 1)
                         {
-                            sb.Append("[B]"); // Boss room discovered
+                            // Player is next to boss: show discovery/marker
+                            sb.Append(room.Visited ? "[B]" : "[?]");
                         }
                         else
                         {
-                            sb.Append("[?]"); // Unknown
+                            // Still hidden: render as normal unexplored/explored room so boss location is not leaked.
+                            sb.Append(room.Visited ? "[E]" : "[ ]");
                         }
                     }
                     else
