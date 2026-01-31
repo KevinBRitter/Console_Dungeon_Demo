@@ -32,7 +32,13 @@ namespace Console_Dungeon.Models
         public int ExperienceToNextLevel { get; set; }
         public int Gold { get; set; }
         public int Kills { get; set; }
-        
+
+        // Inventory & Equipment (Phase 5)
+        public const int MaxInventorySlots = 8;
+        public List<Item> Inventory { get; set; } = new List<Item>();
+        public Item? EquippedWeapon { get; set; }
+        public Item? EquippedArmor { get; set; }
+
         // Track if player just leveled up (for showing level-up screen)
         [NonSerialized]
         private LevelUpInfo? _pendingLevelUp = null;
@@ -45,6 +51,7 @@ namespace Console_Dungeon.Models
             _pendingLevelUp = null;
             return levelUp;
         }
+
         // Constructor with class
         public Player(string name, PlayerClass playerClass)
         {
@@ -92,7 +99,7 @@ namespace Console_Dungeon.Models
             }
             else
             {
-                // Fallback if class not found
+                // Fallback if class not found (preserve original defaults)
                 MaxHealth = 100;
                 Health = MaxHealth;
                 Attack = 10;
@@ -118,9 +125,11 @@ namespace Console_Dungeon.Models
         // Helper methods
         public bool IsAlive => Health > 0;
 
+        // TakeDamage now uses effective defense (base + equipped armor)
         public void TakeDamage(int damage)
         {
-            int actualDamage = Math.Max(1, damage - Defense);
+            int effectiveDefense = GetEffectiveDefense();
+            int actualDamage = Math.Max(1, damage - effectiveDefense);
             Health = Math.Max(0, Health - actualDamage);
         }
 
@@ -186,6 +195,7 @@ namespace Console_Dungeon.Models
                 };
             }
         }
+
         // Helper method to get XP progress as a percentage
         public float GetXPProgress()
         {
@@ -204,5 +214,105 @@ namespace Console_Dungeon.Models
 
             return $"[{filled}>{empty}] {Experience}/{ExperienceToNextLevel} XP";
         }
-    }        
+
+        // Inventory / Equipment helpers (Phase 5)
+
+        // Effective attack includes weapon bonus
+        public int GetEffectiveAttack()
+        {
+            return Attack + (EquippedWeapon?.AttackBonus ?? 0);
+        }
+
+        // Effective defense includes armor bonus
+        public int GetEffectiveDefense()
+        {
+            return Defense + (EquippedArmor?.DefenseBonus ?? 0);
+        }
+
+        // Try to add an item to the player's possessions.
+        // Auto-equips equipment if the corresponding slot is empty.
+        // Returns true if the item was accepted (equipped or added to inventory).
+        public bool AddItem(Item item)
+        {
+            if (item == null) return false;
+
+            // Meta items unlock globally
+            if (item.IsMeta)
+            {
+                MetaUnlockManager.Unlock(item.Id);
+            }
+
+            // Auto-equip equipment if slot empty
+            if (item.Type == ItemType.Equipment)
+            {
+                if (item.Slot == EquipmentSlot.Weapon && EquippedWeapon == null)
+                {
+                    EquippedWeapon = item;
+                    return true;
+                }
+                if (item.Slot == EquipmentSlot.Armor && EquippedArmor == null)
+                {
+                    EquippedArmor = item;
+                    return true;
+                }
+            }
+
+            if (Inventory.Count >= MaxInventorySlots)
+            {
+                // Inventory full — reject item (caller may show a message / drop)
+                return false;
+            }
+
+            Inventory.Add(item);
+            return true;
+        }
+
+        // Equip an item from inventory by id. Returns true if equipped.
+        public bool EquipFromInventory(string itemId)
+        {
+            int idx = Inventory.FindIndex(i => i.Id.Equals(itemId, StringComparison.OrdinalIgnoreCase));
+            if (idx < 0) return false;
+
+            var item = Inventory[idx];
+            if (item.Type != Enums.ItemType.Equipment) return false;
+
+            if (item.Slot == Enums.EquipmentSlot.Weapon)
+            {
+                var prev = EquippedWeapon;
+                EquippedWeapon = item;
+                Inventory.RemoveAt(idx);
+                if (prev != null) Inventory.Add(prev);
+                return true;
+            }
+
+            if (item.Slot == Enums.EquipmentSlot.Armor)
+            {
+                var prev = EquippedArmor;
+                EquippedArmor = item;
+                Inventory.RemoveAt(idx);
+                if (prev != null) Inventory.Add(prev);
+                return true;
+            }
+
+            return false;
+        }
+
+        // Use a consumable from inventory by id. Returns true if consumed.
+        public bool UseConsumable(string itemId)
+        {
+            int idx = Inventory.FindIndex(i => i.Id.Equals(itemId, StringComparison.OrdinalIgnoreCase));
+            if (idx < 0) return false;
+
+            var item = Inventory[idx];
+            if (item.Type != Enums.ItemType.Consumable) return false;
+
+            if (item.HealAmount > 0)
+            {
+                Heal(item.HealAmount);
+            }
+
+            Inventory.RemoveAt(idx);
+            return true;
+        }
+    }
 }

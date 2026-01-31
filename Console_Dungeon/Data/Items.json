@@ -1,0 +1,51 @@
+{
+  "Items": [
+    {
+      "Id": "rusty_sword",
+      "Name": "Rusty Sword",
+      "Type": "Equipment",
+      "Slot": "Weapon",
+      "AttackBonus": 3,
+      "Description": "An old sword; better than bare fists."
+    },
+    {
+      "Id": "old_staff",
+      "Name": "Old Staff",
+      "Type": "Equipment",
+      "Slot": "Weapon",
+      "AttackBonus": 2,
+      "Description": "A worn staff. Mages appreciate the heft."
+    },
+    {
+      "Id": "leather_armor",
+      "Name": "Leather Armor",
+      "Type": "Equipment",
+      "Slot": "Armor",
+      "DefenseBonus": 2,
+      "Description": "Light armor that offers minimal protection."
+    },
+    {
+      "Id": "minor_healing",
+      "Name": "Minor Healing Potion",
+      "Type": "Consumable",
+      "HealAmount": 20,
+      "Description": "Restores a small amount of HP."
+    },
+    {
+      "Id": "major_healing",
+      "Name": "Major Healing Potion",
+      "Type": "Consumable",
+      "HealAmount": 50,
+      "Description": "Restores a significant amount of HP."
+    },
+    {
+      "Id": "divine_blade",
+      "Name": "Divine Blade",
+      "Type": "Equipment",
+      "Slot": "Weapon",
+      "AttackBonus": 10,
+      "IsMeta": true,
+      "Description": "A legendary blade. Its flavor text nods to the roguelike loop — it persists across runs once earned."
+    }
+  ]
+}

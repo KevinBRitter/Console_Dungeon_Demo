@@ -149,9 +149,10 @@ namespace Console_Dungeon.Encounters
 
                         var target = enemyInstances[targetIdx];
 
-                        // Player damage roll
-                        int minPlayerDamage = Math.Max(1, _gameState.Player.Attack / 2);
-                        int maxPlayerDamage = Math.Max(minPlayerDamage, _gameState.Player.Attack);
+                        // Player damage roll (use effective attack including weapon)
+                        int effectiveAttack = _gameState.Player.GetEffectiveAttack();
+                        int minPlayerDamage = Math.Max(1, effectiveAttack / 2);
+                        int maxPlayerDamage = Math.Max(minPlayerDamage, effectiveAttack);
                         int playerDamage = encRng.Next(minPlayerDamage, maxPlayerDamage + 1);
 
                         // Apply to target
@@ -175,10 +176,10 @@ namespace Console_Dungeon.Encounters
                         {
                             int rawEnemyDamage = encRng.Next(Math.Max(1, enemy.DamageMin), Math.Max(enemy.DamageMin, enemy.DamageMax) + 1);
 
-                            // Compute actual damage after defense
-                            int actualDamage = Math.Max(1, rawEnemyDamage - _gameState.Player.Defense);
+                            // Compute actual damage after defense (includes equipped armor)
+                            int actualDamage = Math.Max(1, rawEnemyDamage - _gameState.Player.GetEffectiveDefense());
 
-                            // Apply damage using Player.TakeDamage (pass raw to keep logic consistent)
+                            // Apply damage using Player.TakeDamage (now considers equipped armor)
                             _gameState.Player.TakeDamage(rawEnemyDamage);
 
                             combatResult.TotalDamage += actualDamage;
@@ -230,7 +231,7 @@ namespace Console_Dungeon.Encounters
                             combatResult.LootMessage = $"You gather {combatResult.TotalGold} gold.";
                         }
 
-                        // Apply gold and kills to player
+                        // Apply gold and kills to player (base enemy loot)
                         _gameState.Player.Gold += combatResult.TotalGold;
                         _gameState.Player.Kills += combatResult.TotalKills;
 
@@ -245,8 +246,38 @@ namespace Console_Dungeon.Encounters
                             _gameState.CurrentLevel.IsBossDefeated = true;
                         }
 
+                        // Generate additional loot/items using LootManager.
+                        // Difficulty factor can be scaled by level or totalDamage; keep simple for now.
+                        int difficultyFactor = Math.Max(1, _gameState.CurrentLevel.LevelNumber);
+                        var loot = LootManager.GenerateCombatLoot(encRng, difficultyFactor: difficultyFactor, ensureNonEmpty: true);
+
+                        // Apply generated loot
+                        if (loot.gold > 0)
+                        {
+                            _gameState.Player.Gold += loot.gold;
+                        }
+
+                        var lootMessagesSb = new System.Text.StringBuilder();
+                        foreach (var msg in loot.messages)
+                        {
+                            lootMessagesSb.AppendLine(msg);
+                        }
+
+                        foreach (var item in loot.items)
+                        {
+                            bool accepted = _gameState.Player.AddItem(item);
+                            if (!accepted)
+                            {
+                                lootMessagesSb.AppendLine($"You couldn't carry the {item.Name} and left it behind.");
+                            }
+                            else
+                            {
+                                lootMessagesSb.AppendLine($"Added {item.Name} to your possessions.");
+                            }
+                        }
+
                         string xpMessage = MessageManager.GetMessage("experience.gained", ("xp", totalXP));
-                        encounterText = combatResult.GetFullMessage() + $"\n\n{xpMessage}";
+                        encounterText = combatResult.GetFullMessage() + $"\n\n{xpMessage}\n\n" + lootMessagesSb.ToString().TrimEnd();
 
                         ScreenRenderer.DrawScreen(encounterText + "\n\nPress any key to continue...");
                         InputHandler.WaitForKey();
@@ -297,11 +328,33 @@ namespace Console_Dungeon.Encounters
         private string HandleTreasure(Random rng)
         {
             var encounters = EncounterManager.GetEncounters();
-            int goldAmount = rng.Next(5, 21);
-            _gameState.Player.Gold += goldAmount;
+            // Use LootManager to generate treasure
+            var treasure = LootManager.GenerateTreasure(rng, ensureNonEmpty: true);
 
+            // Apply treasure
+            if (treasure.gold > 0)
+            {
+                _gameState.Player.Gold += treasure.gold;
+            }
+
+            var sb = new System.Text.StringBuilder();
             string template = encounters.TreasureEncounters[rng.Next(encounters.TreasureEncounters.Count)];
-            return EncounterManager.FormatMessage(template, ("gold", goldAmount));
+            sb.AppendLine(EncounterManager.FormatMessage(template, ("gold", treasure.gold)));
+
+            foreach (var item in treasure.items)
+            {
+                bool accepted = _gameState.Player.AddItem(item);
+                if (!accepted)
+                {
+                    sb.AppendLine($"You cannot carry the {item.Name}; it remains on the ground.");
+                }
+                else
+                {
+                    sb.AppendLine($"You pocket: {item.Name} - {item.Description}");
+                }
+            }
+
+            return sb.ToString().TrimEnd();
         }
 
         private CombatEncounter GetBossEncounter(EncounterData encounters, int currentLevel, Random rng)
@@ -353,7 +406,25 @@ namespace Console_Dungeon.Encounters
         private string HandleEmptyRoom(Random rng)
         {
             var encounters = EncounterManager.GetEncounters();
-            return encounters.EmptyRooms[rng.Next(encounters.EmptyRooms.Count)];
+            var loot = LootManager.GenerateEmptyRoomLoot(rng);
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine(encounters.EmptyRooms[rng.Next(encounters.EmptyRooms.Count)]);
+            foreach (var msg in loot.messages)
+            {
+                sb.AppendLine(msg);
+            }
+
+            // Apply small finds
+            if (loot.gold > 0) _gameState.Player.Gold += loot.gold;
+            foreach (var item in loot.items)
+            {
+                bool accepted = _gameState.Player.AddItem(item);
+                if (accepted) sb.AppendLine($"You pick up {item.Name}.");
+                else sb.AppendLine($"You found {item.Name} but could not carry it.");
+            }
+
+            return sb.ToString().TrimEnd();
         }
     }
 }

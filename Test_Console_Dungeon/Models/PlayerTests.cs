@@ -8,15 +8,17 @@ namespace Console_Dungeon.Tests.Models
         public void NewPlayer_InitializesWithCorrectDefaults()
         {
             // Arrange & Act
+            // default class is Warrior
             var player = new Player("TestHero");
 
             // Assert
             Assert.Equal("TestHero", player.Name);
             Assert.Equal(1, player.Level);
-            Assert.Equal(100, player.MaxHealth);
-            Assert.Equal(100, player.Health);
-            Assert.Equal(10, player.Attack);
-            Assert.Equal(5, player.Defense);
+            Assert.Equal(120, player.MaxHealth);
+            Assert.Equal(120, player.Health);
+            Assert.Equal(12, player.Attack);
+            Assert.Equal(8, player.Defense);
+            Assert.Equal(100, player.MaxStamina);
             Assert.Equal(0, player.Experience);
             Assert.Equal(0, player.Gold);
             Assert.Equal(0, player.PositionX);
@@ -91,6 +93,7 @@ namespace Console_Dungeon.Tests.Models
         {
             // Arrange
             var player = new Player("Hero");
+            player.MaxHealth = 100;
             player.Health = 90;
 
             // Act

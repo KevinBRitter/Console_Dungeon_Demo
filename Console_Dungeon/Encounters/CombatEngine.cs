@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Console_Dungeon.Managers;
+﻿using Console_Dungeon.Managers;
 using Console_Dungeon.Models;
 
 namespace Console_Dungeon.Encounters
@@ -74,9 +72,10 @@ namespace Console_Dungeon.Encounters
                 var target = enemies.Find(e => e.IsAlive);
                 if (target != null)
                 {
-                    // Player damage roll: small variance around player's Attack
-                    int minPlayerDamage = Math.Max(1, player.Attack / 2);
-                    int maxPlayerDamage = Math.Max(minPlayerDamage, player.Attack);
+                    // Use effective attack which includes weapon bonuses
+                    int effectiveAttack = player.GetEffectiveAttack();
+                    int minPlayerDamage = Math.Max(1, effectiveAttack / 2);
+                    int maxPlayerDamage = Math.Max(minPlayerDamage, effectiveAttack);
                     int playerDamage = rng.Next(minPlayerDamage, maxPlayerDamage + 1);
 
                     target.Health = Math.Max(0, target.Health - playerDamage);
@@ -102,11 +101,10 @@ namespace Console_Dungeon.Encounters
 
                     int rawEnemyDamage = rng.Next(Math.Max(1, enemy.DamageMin), Math.Max(enemy.DamageMin, enemy.DamageMax) + 1);
 
-                    // Compute actual damage after player's defense (same formula as Player.TakeDamage)
-                    int actualDamage = Math.Max(1, rawEnemyDamage - player.Defense);
+                    // Compute actual damage after player's effective defense (armor included)
+                    int actualDamage = Math.Max(1, rawEnemyDamage - player.GetEffectiveDefense());
 
-                    // Apply damage to player using Player.TakeDamage (which also applies defense).
-                    // Pass the raw roll so Player.TakeDamage will compute the same actualDamage.
+                    // Apply damage to player using Player.TakeDamage (which now uses effective defense)
                     player.TakeDamage(rawEnemyDamage);
 
                     // Record actual damage (not the raw roll) for messaging/statistics
