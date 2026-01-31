@@ -87,6 +87,7 @@ Goal: Give the player stats and decisions that matter.
 ## Phase 4 — Interaction & Combat
 
 Goal: Introduce risk and consequence.
+`Implemented: 01/30/26 - KR`
 
 - Simple Combat System
     - Turn-based, deterministic or lightly randomized.
@@ -107,6 +108,7 @@ Goal: Introduce risk and consequence.
 ## Phase 5 — Inventory & Items
 
 Goal: Add long-term decisions and rewards.
+`Implemented: 01/31/26 - KR`
 
 - Inventory System
     - Fixed-size list or weightless slots.
