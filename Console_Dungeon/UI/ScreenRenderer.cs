@@ -266,9 +266,12 @@ namespace Console_Dungeon.UI
         // When boss is defeated show [✓] regardless.
         public static string RenderMap(DungeonLevel level, Models.Player player)
         {
-            var sb = new StringBuilder();
+            var mapLines = new List<string>();
+
+            // Build map lines
             for (int y = 0; y < level.Height; y++)
             {
+                var lineSb = new StringBuilder();
                 for (int x = 0; x < level.Width; x++)
                 {
                     var room = level.GetRoom(x, y);
@@ -276,11 +279,11 @@ namespace Console_Dungeon.UI
                     if (player.PositionX == x && player.PositionY == y)
                     {
                         // Always show player position as [X] (player is always on a walkable tile).
-                        sb.Append("[X]");
+                        lineSb.Append("[X]");
                     }
                     else if (room.IsBlocked)
                     {
-                        sb.Append("   "); //[Z]
+                        lineSb.Append("   "); //[Z]
                     }
                     else if (x == level.BossRoomX && y == level.BossRoomY)
                     {
@@ -293,38 +296,80 @@ namespace Console_Dungeon.UI
 
                         if (level.IsBossDefeated)
                         {
-                            sb.Append("[✓]");
+                            lineSb.Append("[✓]");
                         }
                         else if (manhattan <= 1)
                         {
                             // Player is next to boss: show discovery/marker
-                            sb.Append(room.Visited ? "[B]" : "[?]");
+                            lineSb.Append(room.Visited ? "[B]" : "[?]");
                         }
                         else
                         {
                             // Still hidden: render as normal unexplored/explored room so boss location is not leaked.
-                            sb.Append(room.Visited ? "[E]" : "[ ]");
+                            lineSb.Append(room.Visited ? "[E]" : "[ ]");
                         }
                     }
                     else
                     {
-                        sb.Append(room.Visited ? "[E]" : "[ ]");
+                        lineSb.Append(room.Visited ? "[E]" : "[ ]");
                     }
 
                     // Add a small spacer between columns for readability
                     if (x < level.Width - 1)
                     {
-                        sb.Append(" ");
+                        lineSb.Append(" ");
                     }
                 }
 
-                if (y < level.Height - 1)
+                mapLines.Add(lineSb.ToString());
+            }
+
+            // Create compass rose (using ASCII for consistent spacing)
+            var compass = new List<string>
+            {
+                "     N     ",
+                "     ^     ",
+                " W < + > E ",
+                "     v     ",
+                "     S     "
+            };
+
+            // Combine map and compass side by side
+            var result = new StringBuilder();
+            int maxLines = Math.Max(mapLines.Count, compass.Count);
+
+            for (int i = 0; i < maxLines; i++)
+            {
+                // Add map line (or empty space if map is shorter)
+                if (i < mapLines.Count)
                 {
-                    sb.AppendLine();
+                    result.Append(mapLines[i]);
+                }
+                else
+                {
+                    // Pad with spaces if compass is taller than map
+                    int mapWidth = mapLines.Count > 0 ? mapLines[0].Length : 0;
+                    result.Append(new string(' ', mapWidth));
+                }
+
+                // Add spacing between map and compass
+                result.Append("    ");
+
+                // Add compass line (centered vertically)
+                int compassStartLine = (maxLines - compass.Count) / 2;
+                if (i >= compassStartLine && i < compassStartLine + compass.Count)
+                {
+                    result.Append(compass[i - compassStartLine]);
+                }
+
+                // Add newline except for last line
+                if (i < maxLines - 1)
+                {
+                    result.AppendLine();
                 }
             }
 
-            return sb.ToString();
+            return result.ToString();
         }
     }
 }

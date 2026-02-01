@@ -263,7 +263,12 @@ namespace Console_Dungeon.Encounters
                             lootMessagesSb.AppendLine(msg);
                         }
 
-                        foreach (var item in loot.items)
+                        // Separate equipment from other items
+                        var equipmentItems = loot.items.Where(i => i.Type == Enums.ItemType.Equipment).ToList();
+                        var otherItems = loot.items.Where(i => i.Type != Enums.ItemType.Equipment).ToList();
+
+                        // Handle non-equipment items first
+                        foreach (var item in otherItems)
                         {
                             bool accepted = _gameState.Player.AddItem(item);
                             if (!accepted)
@@ -281,6 +286,12 @@ namespace Console_Dungeon.Encounters
 
                         ScreenRenderer.DrawScreen(encounterText + "\n\nPress any key to continue...");
                         InputHandler.WaitForKey();
+
+                        // Now handle equipment items with comparison UI
+                        foreach (var item in equipmentItems)
+                        {
+                            ProcessItemLoot(item, lootMessagesSb);
+                        }
                     }
                     else
                     {
@@ -341,7 +352,12 @@ namespace Console_Dungeon.Encounters
             string template = encounters.TreasureEncounters[rng.Next(encounters.TreasureEncounters.Count)];
             sb.AppendLine(EncounterManager.FormatMessage(template, ("gold", treasure.gold)));
 
-            foreach (var item in treasure.items)
+            // Separate equipment from other items
+            var equipmentItems = treasure.items.Where(i => i.Type == Enums.ItemType.Equipment).ToList();
+            var otherItems = treasure.items.Where(i => i.Type != Enums.ItemType.Equipment).ToList();
+
+            // Handle non-equipment items first
+            foreach (var item in otherItems)
             {
                 bool accepted = _gameState.Player.AddItem(item);
                 if (!accepted)
@@ -354,7 +370,21 @@ namespace Console_Dungeon.Encounters
                 }
             }
 
-            return sb.ToString().TrimEnd();
+            // Show the treasure message first
+            string treasureMessage = sb.ToString().TrimEnd();
+            if (!string.IsNullOrEmpty(treasureMessage))
+            {
+                ScreenRenderer.DrawScreen(treasureMessage + "\n\nPress any key to continue...");
+                InputHandler.WaitForKey();
+            }
+
+            // Then handle equipment items with comparison UI
+            foreach (var item in equipmentItems)
+            {
+                ProcessItemLoot(item, sb);
+            }
+
+            return treasureMessage;
         }
 
         private CombatEncounter GetBossEncounter(EncounterData encounters, int currentLevel, Random rng)
@@ -417,14 +447,62 @@ namespace Console_Dungeon.Encounters
 
             // Apply small finds
             if (loot.gold > 0) _gameState.Player.Gold += loot.gold;
-            foreach (var item in loot.items)
+
+            // Separate equipment from other items
+            var equipmentItems = loot.items.Where(i => i.Type == Enums.ItemType.Equipment).ToList();
+            var otherItems = loot.items.Where(i => i.Type != Enums.ItemType.Equipment).ToList();
+
+            // Handle non-equipment items
+            foreach (var item in otherItems)
             {
                 bool accepted = _gameState.Player.AddItem(item);
                 if (accepted) sb.AppendLine($"You pick up {item.Name}.");
                 else sb.AppendLine($"You found {item.Name} but could not carry it.");
             }
 
-            return sb.ToString().TrimEnd();
+            string emptyRoomMessage = sb.ToString().TrimEnd();
+
+            // If there are equipment items, show the message first, then handle equipment
+            if (equipmentItems.Count > 0)
+            {
+                if (!string.IsNullOrEmpty(emptyRoomMessage))
+                {
+                    ScreenRenderer.DrawScreen(emptyRoomMessage + "\n\nPress any key to continue...");
+                    InputHandler.WaitForKey();
+                }
+
+                foreach (var item in equipmentItems)
+                {
+                    ProcessItemLoot(item, sb);
+                }
+            }
+
+            return emptyRoomMessage;
+        }
+
+        // Helper method to handle item acquisition with equipment comparison
+        private void ProcessItemLoot(Item item, System.Text.StringBuilder messageBuilder)
+        {
+            // Check if item is equipment
+            if (item.Type == Enums.ItemType.Equipment)
+            {
+                // Use CompareItemAction for equipment
+                var compareAction = new Actions.CompareItemAction(item);
+                compareAction.Execute(_gameState);
+            }
+            else
+            {
+                // For consumables and misc items, use the old logic
+                bool accepted = _gameState.Player.AddItem(item);
+                if (!accepted)
+                {
+                    messageBuilder.AppendLine($"You couldn't carry the {item.Name} and left it behind.");
+                }
+                else
+                {
+                    messageBuilder.AppendLine($"Added {item.Name} to your possessions.");
+                }
+            }
         }
     }
 }

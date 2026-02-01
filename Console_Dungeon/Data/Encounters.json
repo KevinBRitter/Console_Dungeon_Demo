@@ -32,9 +32,9 @@
   ],
 
   "_comment_enemies": "===== ENEMY TYPE DEFINITIONS =====",
+  "_comment_enemy_order": "Goblinoids, then Undead, then Slimes, then Beasts, then Magical",
 
   "enemyTypes": {
-    "_comment_goblinoids": "--- Goblinoids ---",
     "goblin": {
       "name": "Goblin",
       "damageMin": 8,
@@ -56,8 +56,6 @@
       "goldMin": 15,
       "goldMax": 30
     },
-
-    "_comment_undead": "--- Undead ---",
     "skeleton": {
       "name": "Skeleton",
       "damageMin": 10,
@@ -79,8 +77,6 @@
       "goldMin": 5,
       "goldMax": 11
     },
-
-    "_comment_beasts": "--- Beasts & Creatures ---",
     "boneCrocodile": {
       "name": "Bone Crocodile",
       "damageMin": 12,
@@ -88,8 +84,6 @@
       "goldMin": 7,
       "goldMax": 13
     },
-
-    "_comment_magical": "--- Magical Enemies ---",
     "witch": {
       "name": "Witch",
       "damageMin": 20,
@@ -100,9 +94,9 @@
   },
 
   "_comment_encounters": "===== COMBAT ENCOUNTER SCENARIOS =====",
+  "_comment_note": "Goblinoid encounters (goblins, chiefs) come first, then undead, slimes, and bosses",
 
   "combatEncounters": [
-    { "_comment_goblinoid_encounters": "--- Goblinoid Encounters ---" },
     {
       "id": "single_goblin",
       "weight": 10,
@@ -231,8 +225,6 @@
         "The goblins had {totalGold} gold between them."
       ]
     },
-
-    { "_comment_undead_encounters": "--- Undead Encounters ---" },
     {
       "id": "single_skeleton",
       "weight": 10,
@@ -295,8 +287,6 @@
         "Among the bones, you find {totalGold} gold total."
       ]
     },
-
-    {"_comment_slime_encounters": "--- Slime Encounters ---"},
     {
       "id": "single_slime",
       "weight": 8,
@@ -363,8 +353,6 @@
         "Somehow, the lava slime had {totalGold} gold inside it."
       ]
     },
-
-    { "_comment_boss_encounters": "--- Boss Encounters ---" },
     {
       "id": "boss_with_minions",
       "weight": 2,

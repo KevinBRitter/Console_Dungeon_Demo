@@ -38,6 +38,7 @@ namespace Console_Dungeon.Models
         public List<Item> Inventory { get; set; } = new List<Item>();
         public Item? EquippedWeapon { get; set; }
         public Item? EquippedArmor { get; set; }
+        public Item? EquippedJewelry { get; set; }
 
         // Track if player just leveled up (for showing level-up screen)
         [NonSerialized]
@@ -255,6 +256,11 @@ namespace Console_Dungeon.Models
                     EquippedArmor = item;
                     return true;
                 }
+                if (item.Slot == EquipmentSlot.Jewelry && EquippedJewelry == null)
+                {
+                    EquippedJewelry = item;
+                    return true;
+                }
             }
 
             if (Inventory.Count >= MaxInventorySlots)
@@ -289,6 +295,15 @@ namespace Console_Dungeon.Models
             {
                 var prev = EquippedArmor;
                 EquippedArmor = item;
+                Inventory.RemoveAt(idx);
+                if (prev != null) Inventory.Add(prev);
+                return true;
+            }
+
+            if (item.Slot == Enums.EquipmentSlot.Jewelry)
+            {
+                var prev = EquippedJewelry;
+                EquippedJewelry = item;
                 Inventory.RemoveAt(idx);
                 if (prev != null) Inventory.Add(prev);
                 return true;

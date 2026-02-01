@@ -5,6 +5,7 @@ namespace Console_Dungeon.Enums
     {
         None,
         Weapon,
-        Armor
+        Armor,
+        Jewelry
     }
 }
