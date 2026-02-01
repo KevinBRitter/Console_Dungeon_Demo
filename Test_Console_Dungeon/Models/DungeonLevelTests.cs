@@ -109,7 +109,7 @@ namespace Console_Dungeon.Tests.Models
             var level = new DungeonLevel(1, 123);
 
             // Act - Starting position should always be walkable
-            bool isValid = level.IsValidPosition(level.Width / 2, level.Height / 2);
+            bool isValid = level.IsValidPosition(level.StartX, level.StartY);
 
             // Assert
             Assert.True(isValid);

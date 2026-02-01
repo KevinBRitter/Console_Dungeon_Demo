@@ -148,9 +148,10 @@ namespace Console_Dungeon
             int nextLevelNumber = _gameState.CurrentLevel.LevelNumber + 1;
             _gameState.CurrentLevel = new DungeonLevel(nextLevelNumber, _gameState.Seed + nextLevelNumber);
 
-            // Place player at new level start (center of generated level) and ensure the starting room is valid
-            _gameState.Player.PositionX = _gameState.CurrentLevel.Width / 2;
-            _gameState.Player.PositionY = _gameState.CurrentLevel.Height / 2;
+            // Place player at the actual starting position determined by level generation
+            // This ensures the player starts where the boss room distance calculation expects
+            _gameState.Player.PositionX = _gameState.CurrentLevel.StartX;
+            _gameState.Player.PositionY = _gameState.CurrentLevel.StartY;
 
             var startRoom = _gameState.CurrentLevel.GetRoom(_gameState.Player.PositionX, _gameState.Player.PositionY);
 

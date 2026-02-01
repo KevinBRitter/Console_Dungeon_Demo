@@ -37,10 +37,10 @@ namespace Console_Dungeon.Models
             int roomsThisLevel = 10;
             CurrentLevel = new DungeonLevel(1, seed, gridW, gridH, roomsThisLevel);
 
-            // Place player in the center of the grid (the generator starts here).
-            // TODO: This isn't working as expected the player is placed top left and disconnected from the level
-            Player.PositionX = CurrentLevel.Width / 2;
-            Player.PositionY = CurrentLevel.Height / 2;
+            // Place player at the actual starting position determined by level generation
+            // This ensures the player starts where the boss room distance calculation expects
+            Player.PositionX = CurrentLevel.StartX;
+            Player.PositionY = CurrentLevel.StartY;
 
             // Mark starting room visited if it's not blocked. If blocked for some reason, find nearest walkable.
             var startRoom = CurrentLevel.GetRoom(Player.PositionX, Player.PositionY);

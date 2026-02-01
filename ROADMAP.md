@@ -185,7 +185,11 @@ These are intentionally small but impactful and fit well before â€œfull systemsâ
 - Rare encounters (mimics, treasure guardians, etc.)
 - Rare rooms (campfire for increased healing, shrine for divine item identification/ repair)
 - Environmental hazards (traps, poison gas, etc.)
-- Multiple encounter files - TreasureEncounters.json, Enemies.json, etc.
+- **Split Encounters.json into themed category files** when content exceeds ~1000 lines
+  - Suggested structure: Data/Encounters/Goblinoids.json, Undead.json, Beasts.json, Magical.json, Common.json
+  - Modify EncounterManager to load and merge multiple encounter files
+  - Enables themed dungeon levels (goblin caves, undead crypts, etc.)
+  - Current file has category comments as organizational prep for future split
 - Localization - Encounters_en.json, Encounters_es.json
 - Enemy difficulty tiers - Load different enemy sets per dungeon level
 - Hot reload - Watch JSON files and reload without restarting

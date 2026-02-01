@@ -1,4 +1,6 @@
 {
+  "_comment_general": "===== GENERAL ROOM MESSAGES =====",
+
   "treasureEncounters": [
     "You find a small cache of gold coins scattered on the floor! (+{gold} gold)",
     "A glint catches your eye—a leather pouch containing {gold} gold pieces!",
@@ -28,7 +30,11 @@
     "The room is bare. Any treasures were claimed ages ago.",
     "Empty. Only echoes answer your footsteps."
   ],
+
+  "_comment_enemies": "===== ENEMY TYPE DEFINITIONS =====",
+
   "enemyTypes": {
+    "_comment_goblinoids": "--- Goblinoids ---",
     "goblin": {
       "name": "Goblin",
       "damageMin": 8,
@@ -43,19 +49,21 @@
       "goldMin": 9,
       "goldMax": 15
     },
+    "orcBrute": {
+      "name": "Orc Brute",
+      "damageMin": 20,
+      "damageMax": 35,
+      "goldMin": 15,
+      "goldMax": 30
+    },
+
+    "_comment_undead": "--- Undead ---",
     "skeleton": {
       "name": "Skeleton",
       "damageMin": 10,
       "damageMax": 18,
       "goldMin": 5,
       "goldMax": 11
-    },
-    "boneCrocodile": {
-      "name": "Bone Crocodile",
-      "damageMin": 12,
-      "damageMax": 20,
-      "goldMin": 7,
-      "goldMax": 13
     },
     "slime": {
       "name": "Slime",
@@ -71,22 +79,30 @@
       "goldMin": 5,
       "goldMax": 11
     },
-    "skeletonWarrior": {
-      "name": "Skeleton Warrior",
-      "damageMin": 15,
-      "damageMax": 25,
-      "goldMin": 10,
-      "goldMax": 20
+
+    "_comment_beasts": "--- Beasts & Creatures ---",
+    "boneCrocodile": {
+      "name": "Bone Crocodile",
+      "damageMin": 12,
+      "damageMax": 20,
+      "goldMin": 7,
+      "goldMax": 13
     },
-    "orcBrute": {
-      "name": "Orc Brute",
+
+    "_comment_magical": "--- Magical Enemies ---",
+    "witch": {
+      "name": "Witch",
       "damageMin": 20,
       "damageMax": 35,
       "goldMin": 15,
       "goldMax": 30
     }
   },
+
+  "_comment_encounters": "===== COMBAT ENCOUNTER SCENARIOS =====",
+
   "combatEncounters": [
+    { "_comment_goblinoid_encounters": "--- Goblinoid Encounters ---" },
     {
       "id": "single_goblin",
       "weight": 10,
@@ -215,6 +231,8 @@
         "The goblins had {totalGold} gold between them."
       ]
     },
+
+    { "_comment_undead_encounters": "--- Undead Encounters ---" },
     {
       "id": "single_skeleton",
       "weight": 10,
@@ -277,6 +295,8 @@
         "Among the bones, you find {totalGold} gold total."
       ]
     },
+
+    {"_comment_slime_encounters": "--- Slime Encounters ---"},
     {
       "id": "single_slime",
       "weight": 8,
@@ -318,7 +338,7 @@
         {
           "type": "lavaSlime",
           "count": 1
-        },        
+        },
         {
           "type": "slime",
           "count": 1
@@ -339,10 +359,12 @@
       "lootMessages": [
         "Within the lava slime's remains, you spot {totalGold} gold coins it had absorbed.",
         "Their gooey bodies dissolve, leaving {totalGold} gold behind.",
-        "You extract {totalGold} gold from the slime's gelatinous masses.",
+        "You extract {totalGold} gold from the lava slime's gelatinous masses.",
         "Somehow, the lava slime had {totalGold} gold inside it."
       ]
     },
+
+    { "_comment_boss_encounters": "--- Boss Encounters ---" },
     {
       "id": "boss_with_minions",
       "weight": 2,
@@ -376,6 +398,37 @@
         "The orc and goblins had {totalGold} gold total.",
         "You gather an impressive {totalGold} gold from the bodies.",
         "Your spoils include {totalGold} gold pieces!"
+      ]
+    },
+    {
+      "id": "witch_boss",
+      "weight": 2,
+      "minLevel": 5,
+      "maxLevel": 15,
+      "isBoss": true,
+      "enemies": [
+        {
+          "type": "witch",
+          "count": 1
+        }
+      ],
+      "encounterMessages": [
+        "A cackling witch emerges from the shadows, chanting in a language you don't know!",
+        "A hunched witch points a crooked finger and throws a sudden hex your way!",
+        "A hooded witch steps forward, her eyes glowing with eldritch light!",
+        "You hear a shrill laugh as a witch in tattered robes descends from the rafters!"
+      ],
+      "victoryMessages": [
+        "You dispel her spells but her curses leave you with {totalDamage} damage.",
+        "Her dark magic fades, but you suffer {totalDamage} damage in the duel.",
+        "After a harrowing confrontation, you defeat the witch but take {totalDamage} damage.",
+        "You break her enchantments and stand victorious, wounded for {totalDamage} damage."
+      ],
+      "lootMessages": [
+        "In the witch's satchel you find {totalGold} gold and curious herbs.",
+        "The witch's pouch yields {totalGold} gold and a bitter charm.",
+        "You pry coins from her grasp — {totalGold} gold — and a strange vial.",
+        "Among her trinkets you recover {totalGold} gold and a handful of odd bones."
       ]
     }
   ]
