@@ -80,6 +80,14 @@ namespace Console_Dungeon.Managers
                     },
                     new Item
                     {
+                        Id = "major_healing",
+                        Name = "Major Healing Potion",
+                        Type = Enums.ItemType.Consumable,
+                        HealAmount = 50,
+                        Description = "Restores a significant amount of HP."
+                    },
+                    new Item
+                    {
                         Id = "divine_blade",
                         Name = "Divine Blade",
                         Type = Enums.ItemType.Equipment,

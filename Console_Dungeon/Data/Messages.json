@@ -27,7 +27,7 @@
   },
   "mainActions": {
     "header": "What will you do?\n\n",
-    "options": "  1) View Map (choose direction from the map)\n  2) Search current room (may trigger events)\n  3) Rest (restore 20 HP)\n  4) Check status\n  5) Return to Main Menu\n\n"
+    "options": "  1) View Map (choose direction from the map)\n  2) Search current room (may trigger events)\n  3) Inventory\n  4) Check status\n  5) Return to Main Menu\n\n"
   },
   "mapView": {
     "title": "Map:",
@@ -49,6 +49,6 @@
   },
   "status": {
     "title": "=== Character Status ===",
-    "template": "Name: {name}\nLevel: {level}\nExperience: {experience}\n\nHealth: {health}/{maxHealth}\nAttack: {attack}\nDefense: {defense}\nEnemies Defeated: {kills}\nGold: {gold}\n\nCurrent Location: Dungeon Level {dungeonLevel}\nPosition: ({x}, {y})\n\nTurns Taken: {turns}\nSession Started: {sessionStart}\n\nPress any key to continue..."
+    "template": "Name: {name}  |  Level: {level}\nExperience: {experience}  |  Gold: {gold}\n\nHealth: {health}/{maxHealth}\nAttack: {attack}  |  Defense: {defense}\nEnemies Defeated: {kills}\n\n{equipment}\n\nCurrent Location: Dungeon Level {dungeonLevel}\nPosition: ({x}, {y})\n\nTurns Taken: {turns}\nSession Started: {sessionStart}\n\n\nPress any key to continue..."
   }
 }

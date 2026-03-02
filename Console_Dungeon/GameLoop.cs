@@ -91,7 +91,7 @@ namespace Console_Dungeon
                     CheckLevelCompletion();
                     return null;
                 case "3":
-                    new RestAction().Execute(_gameState);
+                    new ShowInventoryAction().Execute(_gameState);
                     return null;
                 case "4":
                     new ShowStatusAction().Execute(_gameState);
