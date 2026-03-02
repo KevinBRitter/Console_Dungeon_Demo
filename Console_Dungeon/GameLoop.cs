@@ -228,7 +228,9 @@ namespace Console_Dungeon
                     case "2": if (_movementHandler.TryMove(0, 1)) return; break;
                     case "3": if (_movementHandler.TryMove(1, 0)) return; break;
                     case "4": if (_movementHandler.TryMove(-1, 0)) return; break;
-                    case "5": return;
+                    case "5":
+                        DebugLogger.Log("Player chose to return from map view (option 5).");
+                        return;
                     default:
                         ScreenRenderer.DrawScreen(MessageManager.GetMessage("menu.invalidMapChoice"));
                         InputHandler.WaitForKey();
@@ -241,7 +243,9 @@ namespace Console_Dungeon
         {
             ScreenRenderer.DrawScreen(MessageManager.GetMessage("menu.confirmExit"));
             string input = InputHandler.GetMenuChoice();
-            return input == "1";
+            bool confirmed = input == "1";
+            DebugLogger.Log($"ConfirmExit: player chose '{input}' -> confirmed={confirmed}");
+            return confirmed;
         }
 
         private void ShowInvalidAction()

@@ -1,4 +1,5 @@
-﻿using Console_Dungeon.Generation;
+﻿using Console_Dungeon.Enums;
+using Console_Dungeon.Generation;
 using Console_Dungeon.Managers;
 
 namespace Console_Dungeon.Models
@@ -219,6 +220,7 @@ namespace Console_Dungeon.Models
             BossRoomY = bossY;
             Rooms[bossX, bossY].IsBossRoom = true;
             Rooms[bossX, bossY].HasEncounter = true; // ENSURE THIS IS SET
+            Rooms[bossX, bossY].Encounter = EncounterKind.Combat; // ENSURE ENCOUNTER KIND IS SET
             Rooms[bossX, bossY].IsBlocked = false;
 
             var rng = new Random(Seed);

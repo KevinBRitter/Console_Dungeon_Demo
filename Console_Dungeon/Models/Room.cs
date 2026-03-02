@@ -32,6 +32,6 @@ namespace Console_Dungeon.Models
         }
 
         // Helper property for clarity
-        public bool CanTriggerEncounter => Encounter != EncounterKind.None && !EncounterTriggered;
+        public bool CanTriggerEncounter => (IsBossRoom || Encounter != EncounterKind.None) && !EncounterTriggered;
     }
 }

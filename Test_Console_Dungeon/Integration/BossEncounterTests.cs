@@ -1,5 +1,6 @@
 ﻿using Console_Dungeon;
 using Console_Dungeon.Encounters;
+using Console_Dungeon.Enums;
 using Console_Dungeon.Models;
 using Xunit;
 
@@ -46,6 +47,58 @@ namespace Console_Dungeon.Tests.Integration
 
             // Note: We can't actually test TriggerEncounter here without mocking UI,
             // but we can verify the conditions are correct
+        }
+
+        [Fact]
+        public void BossRoom_EncounterKind_IsCombat()
+        {
+            // Regression test: PlaceBossRoom must set Encounter = Combat.
+            // Before the fix, Encounter was left as None if the cell was initially
+            // generated without an encounter, so the encounter never fired.
+
+            // Arrange
+            var level = new DungeonLevel(1, 99999);
+
+            // Act
+            var bossRoom = level.GetRoom(level.BossRoomX, level.BossRoomY);
+
+            // Assert
+            Assert.True(bossRoom.Encounter == EncounterKind.Combat,
+                "Boss room Encounter must be Combat so the encounter handler fires");
+        }
+
+        [Fact]
+        public void BossRoom_CanTriggerEncounter_EvenWhenEncounterKindIsNone()
+        {
+            // Regression test: CanTriggerEncounter must use IsBossRoom as a fallback
+            // guard so the encounter handler's IsBossRoom override can never be silently
+            // bypassed by a stale Encounter == None value.
+
+            // Arrange - manually construct a worst-case boss room
+            var room = new Room("A dark throne room.", hasEncounter: false);
+            room.IsBossRoom = true;
+            // Encounter is None because hasEncounter was false
+
+            // Assert
+            Assert.Equal(EncounterKind.None, room.Encounter);
+            Assert.True(room.CanTriggerEncounter,
+                "IsBossRoom should make CanTriggerEncounter true even when Encounter == None");
+        }
+
+        [Fact]
+        public void BossRoom_CannotTriggerEncounter_AfterEncounterFires()
+        {
+            // Regression test: once the boss encounter has been triggered,
+            // CanTriggerEncounter must return false regardless of IsBossRoom.
+
+            // Arrange
+            var room = new Room("A dark throne room.", hasEncounter: true);
+            room.IsBossRoom = true;
+            room.EncounterTriggered = true;
+
+            // Assert
+            Assert.False(room.CanTriggerEncounter,
+                "Boss room should not trigger a second encounter once EncounterTriggered is set");
         }
 
         [Fact]
