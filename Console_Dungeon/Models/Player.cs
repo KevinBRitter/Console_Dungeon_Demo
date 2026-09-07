@@ -218,16 +218,16 @@ namespace Console_Dungeon.Models
 
         // Inventory / Equipment helpers (Phase 5)
 
-        // Effective attack includes weapon bonus
+        // Effective attack includes weapon and jewelry bonuses
         public int GetEffectiveAttack()
         {
-            return Attack + (EquippedWeapon?.AttackBonus ?? 0);
+            return Attack + (EquippedWeapon?.AttackBonus ?? 0) + (EquippedJewelry?.AttackBonus ?? 0);
         }
 
-        // Effective defense includes armor bonus
+        // Effective defense includes armor and jewelry bonuses
         public int GetEffectiveDefense()
         {
-            return Defense + (EquippedArmor?.DefenseBonus ?? 0);
+            return Defense + (EquippedArmor?.DefenseBonus ?? 0) + (EquippedJewelry?.DefenseBonus ?? 0);
         }
 
         // Try to add an item to the player's possessions.

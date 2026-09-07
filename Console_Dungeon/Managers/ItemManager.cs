@@ -16,10 +16,14 @@ namespace Console_Dungeon.Managers
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 if (_items == null)
+                {
+                    DebugLogger.Log($"ItemManager: '{filePath}' deserialized to null; falling back to built-in items.");
                     _items = CreateDefaultItems();
+                }
             }
-            catch
+            catch (Exception ex)
             {
+                DebugLogger.Log($"ItemManager: failed to load '{filePath}' ({ex.Message}); falling back to built-in items.");
                 _items = CreateDefaultItems();
             }
         }
@@ -37,6 +41,8 @@ namespace Console_Dungeon.Managers
             return coll.Items.FirstOrDefault(i => i.Id.Equals(id, StringComparison.OrdinalIgnoreCase))?.Clone();
         }
 
+        // Safety net for a missing or malformed Data/Items.json.
+        // This is a MIRROR of that file - keep the two in sync when adding or editing items.
         private static ItemCollection CreateDefaultItems()
         {
             return new ItemCollection
@@ -72,6 +78,24 @@ namespace Console_Dungeon.Managers
                     },
                     new Item
                     {
+                        Id = "iron_ring",
+                        Name = "Iron Ring",
+                        Type = Enums.ItemType.Equipment,
+                        Slot = Enums.EquipmentSlot.Jewelry,
+                        AttackBonus = 1,
+                        Description = "A plain band. The metal hums faintly when you swing."
+                    },
+                    new Item
+                    {
+                        Id = "warding_amulet",
+                        Name = "Warding Amulet",
+                        Type = Enums.ItemType.Equipment,
+                        Slot = Enums.EquipmentSlot.Jewelry,
+                        DefenseBonus = 2,
+                        Description = "A carved charm that turns aside the worst of a blow."
+                    },
+                    new Item
+                    {
                         Id = "minor_healing",
                         Name = "Minor Healing Potion",
                         Type = Enums.ItemType.Consumable,
@@ -94,7 +118,7 @@ namespace Console_Dungeon.Managers
                         Slot = Enums.EquipmentSlot.Weapon,
                         AttackBonus = 10,
                         IsMeta = true,
-                        Description = "A legendary blade. It whispers of the roguelike loop."
+                        Description = "A legendary blade. Its flavor text nods to the roguelike loop - it persists across runs once earned."
                     }
                 }
             };

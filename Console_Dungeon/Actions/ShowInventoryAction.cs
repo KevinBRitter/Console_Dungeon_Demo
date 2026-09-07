@@ -43,14 +43,17 @@ namespace Console_Dungeon.Actions
 
             // Equipped items header
             sb.AppendLine("Equipped:");
-            string weaponLine = player.EquippedWeapon != null
-                ? $"{player.EquippedWeapon.Name} (+{player.EquippedWeapon.AttackBonus} ATK)"
-                : "(none)";
-            string armorLine = player.EquippedArmor != null
-                ? $"{player.EquippedArmor.Name} (+{player.EquippedArmor.DefenseBonus} DEF)"
-                : "(none)";
-            sb.AppendLine($"  Weapon: {weaponLine}");
-            sb.AppendLine($"  Armor:  {armorLine}");
+            sb.AppendLine($"  Weapon:  {DescribeEquipped(player.EquippedWeapon)}");
+            sb.AppendLine($"  Armor:   {DescribeEquipped(player.EquippedArmor)}");
+
+            // Only costs a line when something is actually equipped - the inventory list
+            // has to share the renderer's fixed 20-row content area.
+            if (player.EquippedJewelry != null)
+            {
+                sb.AppendLine($"  Jewelry: {DescribeEquipped(player.EquippedJewelry)}");
+            }
+
+            sb.AppendLine($"  Effective: {player.GetEffectiveAttack()} ATK  |  {player.GetEffectiveDefense()} DEF");
             sb.AppendLine();
 
             // Item list
@@ -255,6 +258,14 @@ namespace Console_Dungeon.Actions
         }
 
         // ── Helpers ────────────────────────────────────────────────────────────
+
+        private string DescribeEquipped(Item? item)
+        {
+            if (item == null) return "(none)";
+
+            string summary = FormatStatSummary(item);
+            return string.IsNullOrEmpty(summary) ? item.Name : $"{item.Name} ({summary})";
+        }
 
         private string FormatStatSummary(Item item)
         {

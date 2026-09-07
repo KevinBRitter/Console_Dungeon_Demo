@@ -43,12 +43,8 @@
     "blocked": "You cannot enter that space. A solid wall blocks your path.\n\nPress any key to continue...",
     "returning": "You return to a familiar chamber."
   },
-  "rest": {
-    "healAmount": 20,
-    "message": "You rest for a moment, bandaging your wounds.\n\nRestored {amount} HP. Current HP: {current}/{max}\n\nPress any key to continue..."
-  },
   "status": {
     "title": "=== Character Status ===",
-    "template": "Name: {name}  |  Level: {level}\nExperience: {experience}  |  Gold: {gold}\n\nHealth: {health}/{maxHealth}\nAttack: {attack}  |  Defense: {defense}\nEnemies Defeated: {kills}\n\n{equipment}\n\nCurrent Location: Dungeon Level {dungeonLevel}\nPosition: ({x}, {y})\n\nTurns Taken: {turns}\nSession Started: {sessionStart}\n\n\nPress any key to continue..."
+    "template": "Name: {name}  |  Level: {level}\nExperience: {experience}  |  Gold: {gold}\n{xpBar}\n\nHealth: {health}/{maxHealth}\nAttack: {attack}  |  Defense: {defense}\nEnemies Defeated: {kills}\n\n{equipment}\n\nLocation: Dungeon Level {dungeonLevel} at ({x}, {y})\nTurns Taken: {turns}  |  Started: {sessionStart}\n\nPress any key to continue..."
   }
 }

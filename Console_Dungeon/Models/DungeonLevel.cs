@@ -7,7 +7,6 @@ namespace Console_Dungeon.Models
     [Serializable]
     public class DungeonLevel
     {
-        // TODO: add that only one heal action per level for now, resting respawns enemies
         // Level metadata
         public int LevelNumber { get; set; }
         public int Seed { get; set; }

@@ -19,11 +19,13 @@ namespace Console_Dungeon
         {
             _gameState = gameState;
 
-            // Load configuration
+            // Load configuration. MetaUnlockManager is the one manager not listed here -
+            // it loads from its own static constructor because unlocks outlive a single run.
             EncounterManager.LoadEncounters();
             MessageManager.LoadMessages();
             RoomDescriptionManager.LoadDescriptions();
-            CharacterClassManager.LoadClasses(); // NEW
+            CharacterClassManager.LoadClasses();
+            ItemManager.LoadItems();
 
             // Initialize handlers
             _encounterHandler = new EncounterHandler(gameState);
@@ -127,18 +129,17 @@ namespace Console_Dungeon
 
         private void ShowLevelCompleteScreen()
         {
-            string message =
-                $"=== Level {_gameState.CurrentLevel.LevelNumber} Complete! ===\n\n" +
-                $"You have defeated the boss and conquered this level!\n\n" +
-                $"Statistics:\n" +
-                $"  Rooms Explored: {_gameState.CurrentLevel.RoomsExplored}\n" +
-                $"  Enemies Defeated: {_gameState.Player.Kills}\n" +
-                $"  Gold Collected: {_gameState.Player.Gold}\n" +
-                $"  Current HP: {_gameState.Player.Health}/{_gameState.Player.MaxHealth}\n\n" +
-                $"Descending deeper into the dungeon...\n\n" +
-                $"Press any key to continue...";
+            string title = MessageManager.GetMessage("levelComplete.title",
+                ("level", _gameState.CurrentLevel.LevelNumber));
 
-            ScreenRenderer.DrawScreen(message);
+            string body = MessageManager.GetMessage("levelComplete.message",
+                ("rooms", _gameState.CurrentLevel.RoomsExplored),
+                ("kills", _gameState.Player.Kills),
+                ("gold", _gameState.Player.Gold),
+                ("health", _gameState.Player.Health),
+                ("maxHealth", _gameState.Player.MaxHealth));
+
+            ScreenRenderer.DrawScreen($"{title}\n\n{body}");
             InputHandler.WaitForKey();
         }
 
@@ -199,15 +200,14 @@ namespace Console_Dungeon
             int healAmount = _gameState.Player.MaxHealth / 4; // 25% heal
             _gameState.Player.Heal(healAmount);
 
-            string message =
-                $"=== Dungeon Level {nextLevelNumber} ===\n\n" +
-                $"You descend deeper into the darkness.\n" +
-                $"The air grows colder and more oppressive.\n\n" +
-                $"You recover {healAmount} HP as you catch your breath.\n" +
-                $"Current HP: {_gameState.Player.Health}/{_gameState.Player.MaxHealth}\n\n" +
-                $"Press any key to continue...";
+            string title = MessageManager.GetMessage("nextLevel.title", ("level", nextLevelNumber));
 
-            ScreenRenderer.DrawScreen(message);
+            string body = MessageManager.GetMessage("nextLevel.message",
+                ("healAmount", healAmount),
+                ("health", _gameState.Player.Health),
+                ("maxHealth", _gameState.Player.MaxHealth));
+
+            ScreenRenderer.DrawScreen($"{title}\n\n{body}");
             InputHandler.WaitForKey();
         }
 

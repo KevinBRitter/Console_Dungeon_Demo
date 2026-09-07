@@ -8,6 +8,10 @@ namespace Console_Dungeon
         private static readonly string LogFilePath = "debug.log";
         private static readonly object LockObject = new object();
 
+        // Echoing to the console corrupts the fixed-size box that ScreenRenderer draws,
+        // so it stays off by default. Flip it on when you need live feedback in a terminal.
+        public static bool EchoToConsole { get; set; } = false;
+
         static DebugLogger()
         {
             // Clear log file on startup
@@ -25,12 +29,15 @@ namespace Console_Dungeon
                 try
                 {
                     File.AppendAllText(LogFilePath, $"[{DateTime.Now:HH:mm:ss.fff}] {message}\n");
-                    // Also write to console for immediate feedback
-                    Console.WriteLine($"[DEBUG] {message}");
+
+                    if (EchoToConsole)
+                    {
+                        Console.WriteLine($"[DEBUG] {message}");
+                    }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine($"[LOG ERROR] {ex.Message}");
+                    // Logging is best-effort; never let it disturb the rendered screen.
                 }
             }
         }

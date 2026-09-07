@@ -25,6 +25,22 @@
       "Description": "Light armor that offers minimal protection."
     },
     {
+      "Id": "iron_ring",
+      "Name": "Iron Ring",
+      "Type": "Equipment",
+      "Slot": "Jewelry",
+      "AttackBonus": 1,
+      "Description": "A plain band. The metal hums faintly when you swing."
+    },
+    {
+      "Id": "warding_amulet",
+      "Name": "Warding Amulet",
+      "Type": "Equipment",
+      "Slot": "Jewelry",
+      "DefenseBonus": 2,
+      "Description": "A carved charm that turns aside the worst of a blow."
+    },
+    {
       "Id": "minor_healing",
       "Name": "Minor Healing Potion",
       "Type": "Consumable",
@@ -45,7 +61,7 @@
       "Slot": "Weapon",
       "AttackBonus": 10,
       "IsMeta": true,
-      "Description": "A legendary blade. Its flavor text nods to the roguelike loop — it persists across runs once earned."
+      "Description": "A legendary blade. Its flavor text nods to the roguelike loop - it persists across runs once earned."
     }
   ]
 }

@@ -44,9 +44,8 @@ namespace Console_Dungeon.Encounters
             {
                 case Enums.EncounterKind.Treasure:
                     DebugLogger.Log("Triggering treasure encounter (pre-determined)");
-                    encounterText = HandleTreasure(new Random(_gameState.Seed + _gameState.TurnCount));
-                    ScreenRenderer.DrawScreen(encounterText + "\n\nPress any key to continue...");
-                    InputHandler.WaitForKey();
+                    // HandleTreasure owns its own presentation; do not draw its text again here.
+                    HandleTreasure(new Random(_gameState.Seed + _gameState.TurnCount));
                     break;
 
                 case Enums.EncounterKind.Combat:
@@ -306,9 +305,8 @@ namespace Console_Dungeon.Encounters
                 case Enums.EncounterKind.None:
                 default:
                     DebugLogger.Log("Triggering empty room encounter (pre-determined)");
-                    encounterText = HandleEmptyRoom(new Random(_gameState.Seed + _gameState.TurnCount));
-                    ScreenRenderer.DrawScreen(encounterText + "\n\nPress any key to continue...");
-                    InputHandler.WaitForKey();
+                    // HandleEmptyRoom owns its own presentation; do not draw its text again here.
+                    HandleEmptyRoom(new Random(_gameState.Seed + _gameState.TurnCount));
                     break;
             }
         }
@@ -336,7 +334,9 @@ namespace Console_Dungeon.Encounters
             InputHandler.WaitForKey();
         }
 
-        private string HandleTreasure(Random rng)
+        // Presents the treasure encounter end to end (text, then any equipment comparison screens).
+        // Callers must not re-draw anything after this returns.
+        private void HandleTreasure(Random rng)
         {
             var encounters = EncounterManager.GetEncounters();
             // Use LootManager to generate treasure
@@ -383,8 +383,6 @@ namespace Console_Dungeon.Encounters
             {
                 ProcessItemLoot(item, sb);
             }
-
-            return treasureMessage;
         }
 
         private CombatEncounter GetBossEncounter(EncounterData encounters, int currentLevel, Random rng)
@@ -433,7 +431,9 @@ namespace Console_Dungeon.Encounters
             return encounters[0]; // Fallback
         }
 
-        private string HandleEmptyRoom(Random rng)
+        // Presents the empty-room encounter end to end (text, then any equipment comparison screens).
+        // Callers must not re-draw anything after this returns.
+        private void HandleEmptyRoom(Random rng)
         {
             var encounters = EncounterManager.GetEncounters();
             var loot = LootManager.GenerateEmptyRoomLoot(rng);
@@ -462,22 +462,18 @@ namespace Console_Dungeon.Encounters
 
             string emptyRoomMessage = sb.ToString().TrimEnd();
 
-            // If there are equipment items, show the message first, then handle equipment
-            if (equipmentItems.Count > 0)
+            // Show the room text first
+            if (!string.IsNullOrEmpty(emptyRoomMessage))
             {
-                if (!string.IsNullOrEmpty(emptyRoomMessage))
-                {
-                    ScreenRenderer.DrawScreen(emptyRoomMessage + "\n\nPress any key to continue...");
-                    InputHandler.WaitForKey();
-                }
-
-                foreach (var item in equipmentItems)
-                {
-                    ProcessItemLoot(item, sb);
-                }
+                ScreenRenderer.DrawScreen(emptyRoomMessage + "\n\nPress any key to continue...");
+                InputHandler.WaitForKey();
             }
 
-            return emptyRoomMessage;
+            // Then handle equipment items with comparison UI
+            foreach (var item in equipmentItems)
+            {
+                ProcessItemLoot(item, sb);
+            }
         }
 
         // Helper method to handle item acquisition with equipment comparison

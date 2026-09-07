@@ -75,9 +75,12 @@ namespace Console_Dungeon.Managers
                 {
                     current = dict[part];
                 }
-                else if (current is JsonElement element)
+                else if (current is JsonElement element && element.ValueKind == JsonValueKind.Object
+                         && element.TryGetProperty(part, out var child))
                 {
-                    current = element.GetProperty(part);
+                    // TryGetProperty, not GetProperty: a mistyped sub-key should surface as the
+                    // literal path on screen, not throw KeyNotFoundException mid-render.
+                    current = child;
                 }
                 else
                 {

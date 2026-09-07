@@ -8,6 +8,17 @@ class Program
 {
     static void Main(string[] args)
     {
+        // The renderer emits a few non-ASCII glyphs (the defeated-boss check mark on the map,
+        // em dashes in item text). Without this they render as '?' on a legacy console codepage.
+        try
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+        }
+        catch
+        {
+            // Some hosts refuse encoding changes - fall through, glyphs just degrade.
+        }
+
         // Ensure console is at a usable size before starting UI.
         // EnsureConsoleSize will size the host window larger than the renderer's fixed box.
         EnsureConsoleSize();
